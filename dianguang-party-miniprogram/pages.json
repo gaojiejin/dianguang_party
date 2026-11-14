@@ -1,0 +1,353 @@
+{
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			// uni-ui 规则如下配置
+			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+			"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
+		}
+	},
+	"lazyCodeLoading": "requiredComponents",
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"onReachBottomDistance": 10
+			}
+		},	
+		{
+			"path": "pages/login/changePwd",
+			"style": {
+				"navigationBarTitleText": "忘记密码"
+			}
+		},
+		{"path":"pages/my/certificate","style":{"navigationBarTitleText":"学习证明"}},
+		{
+			"path": "pages/my/my",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/my/information",
+			"style": {
+				"navigationBarTitleText": "个人信息"
+			}
+		},
+		{
+			"path": "pages/my/changepwd",
+			"style": {
+				"navigationBarTitleText": "修改密码"
+			}
+		},
+		{
+			"path": "pages/my/myparty",
+			"style": {
+				"navigationBarTitleText": "个人所在支部"
+			}
+		},
+		{
+			"path": "pages/my/setting",
+			"style": {
+				"navigationBarTitleText": "设置"
+			}
+		},
+		{
+			"path": "pages/user/home/home",
+			"style": {
+				"navigationBarTitleText": "首页", "enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/user/home/catalogue",
+			"style": {
+				"navigationBarTitleText": "首页", "enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/component/image/ImageText",
+			"style": {
+				"navigationBarTitleText": "图文"
+			}
+		},
+		{
+			"path": "pages/component/image/ImageTextLearn",
+			"style": {
+				"navigationBarTitleText": "图文学习",
+				"onReachBottomDistance": 0
+			}
+		},
+		{
+			"path": "pages/component/video/videoLearn",
+			"style": {
+				"navigationBarTitleText": "视频学习"
+			}
+		},
+		{
+			"path": "pages/component/image/linkweb",
+			"style": {
+				"navigationBarTitleText": "外网"
+			}
+		},
+		{
+			"path": "pages/user/learn/learn",
+			"style": {
+				"navigationBarTitleText": "学习", "enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/user/learn/learnDetail",
+			"style": {
+				"navigationBarTitleText": "学习详情"
+			}
+		},
+		{
+			"path": "pages/component/party/selectMember",
+			"style": {
+				"navigationBarTitleText": "选择用户"
+			}
+		},
+		{
+			"path": "pages/component/party/addParty",
+			"style": {
+				"navigationBarTitleText": "添加支部"
+			}
+		},
+		{
+			"path": "pages/component/party/editParty",
+			"style": {
+				"navigationBarTitleText": "编辑支部"
+			}
+		},
+		{
+			"path": "pages/component/member/addMember",
+			"style": {
+				"navigationBarTitleText": "添加党员"
+			}
+		},		{
+			"path": "pages/component/member/addapplicantMember",
+			"style": {
+				"navigationBarTitleText": "积极分子"
+			}
+		},
+		{
+			"path": "pages/component/member/memberDetail",
+			"style": {
+				"navigationBarTitleText": "党员信息"
+			}
+		},
+		
+		{
+			"path": "pages/manager/home/classPublish",
+			"style": {
+				"navigationBarTitleText": "课程发布"
+			}
+		},
+		{
+			"path": "pages/component/content/reContentPublish",
+			"style": {
+				"navigationBarTitleText": "重新提交"
+			}
+		},		{
+			"path": "pages/component/content/editContentPublish",
+			"style": {
+				"navigationBarTitleText": "重新编辑"
+			}
+		},
+		{
+			"path": "pages/component/member/mutiladdMembers",
+			"style": {
+				"navigationBarTitleText": "批量添加"
+			}
+		},
+		{
+			"path": "pages/component/member/mutilgraduate",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/component/member/applicantlearnDetail",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/manager/home/afpmanage",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/component/image/ImageLearn",
+			"style": {
+				"navigationBarTitleText": "查看图文学习"
+			}
+		},
+		{
+			"path": "pages/component/video/videoL",
+			"style": {
+				"navigationBarTitleText": "查看视频学习"
+			}
+		},
+		{
+			"path": "pages/manager/home/home",
+			"style": {
+				"navigationBarTitleText": "首页", "enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/manager/home/contentPublish",
+			"style": {
+				"navigationBarTitleText": "内容发布"
+			}
+		},
+		{
+			"path": "pages/manager/home/picPublish",
+			"style": {
+				"navigationBarTitleText": "轮播图管理"
+			}
+		},
+		{
+			"path": "pages/manager/home/contentReview",
+			"style": {
+				"navigationBarTitleText": "内容审核"
+			}
+		},
+		{
+			"path": "pages/manager/home/contentReview2",
+			"style": {
+				"navigationBarTitleText": "内容审核"
+			}
+		},	{
+			"path": "pages/manager/home/exportpartyLearnrate",
+			"style": {
+				"navigationBarTitleText": "导出支部学习情况"
+			}
+		},{
+			"path": "pages/manager/home/changeLearn",
+			"style": {
+				"navigationBarTitleText": "改变学习状态"
+			}
+		},
+		{
+			"path": "pages/manager/home/partyManage",
+			"style": {
+				"navigationBarTitleText": "支部管理"
+			}
+		},
+		{
+			"path": "pages/manager/home/partyManage2",
+			"style": {
+				"navigationBarTitleText": "支部管理"
+			}
+		},
+		{
+			"path": "pages/manager/home/partyDetail",
+			"style": {
+				"navigationBarTitleText": "支部"
+			}
+		},
+		{
+			"path": "pages/manager/home/learnDetail",
+			"style": {
+				"navigationBarTitleText": "学习详情"
+			}
+		},
+		{
+			"path": "pages/manager/learn/learn",
+			"style": {
+				"navigationBarTitleText": "学习", "enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/manager/learn/learnDetail",
+			"style": {
+				"navigationBarTitleText": "学习详情"
+			}
+		},
+		{
+			"path": "pages/manager/home/partyMember",
+			"style": {
+				"navigationBarTitleText": "支部成员"
+			}
+		},
+		{
+			"path": "pages/manager/home/learnPublish",
+			"style": {
+				"navigationBarTitleText": "章节发布"
+			}
+		},
+		{
+			"path": "pages/manager/home/learnManage",
+			"style": {
+				"navigationBarTitleText": "学习管理"
+			}
+		},
+		{
+			"path": "pages/manager/home/learnManage2",
+			"style": {
+				"navigationBarTitleText": "学习管理"
+			}
+		},
+		{
+			"path": "pages/manager/home/classManage",
+			"style": {
+				"navigationBarTitleText": "课程管理"
+			}
+		},
+		{
+			"path": "pages/manager/home/memberManage",
+			"style": {
+				"navigationBarTitleText": "党员管理"
+			}
+		},
+		{
+			"path": "pages/component/image/ImageTextReview",
+			"style": {
+				"navigationBarTitleText": "内容审核"
+			}
+		},
+		{
+			"path": "pages/component/image/ImageTextReject",
+			"style": {
+				"navigationBarTitleText": "内容驳回"
+			}
+		},
+		{
+			"path": "pages/component/image/linkL",
+			"style": {
+				"navigationBarTitleText": "链接学习"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"list": [{
+			"pagePath": "pages/manager/home/home"
+		},
+		{
+			"pagePath": "pages/manager/learn/learn"
+
+		},
+		{
+			"pagePath": "pages/user/home/home"
+		
+		},
+		{
+			"pagePath": "pages/user/learn/learn"
+		
+		},
+		{
+			"pagePath": "pages/my/my"
+		}]
+	},
+	"uniIdRouter": {}
+}
+

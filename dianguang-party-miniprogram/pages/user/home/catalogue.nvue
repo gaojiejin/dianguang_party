@@ -1,0 +1,98 @@
+<template>
+	<view>
+		<view style="height: 8vh; width: 100%; display: flex; flex-direction: row; border-bottom: 1px #abbedb solid; background-color: white;">
+			<view style="width: 33%;">
+				<view :class="[type === 0 ? 'on_nav' : 'nav']" @click="type = 0">时政要闻</view>
+			</view>
+			<view style="width: 33%;">
+				<view :class="[type === 1 ? 'on_nav' : 'nav']" @click="type = 1">支部动态</view>
+			</view>
+			<view style="width: 33%;">
+				<view :class="[type === 2 ? 'on_nav' : 'nav']" @click="type = 2">微课堂展示</view>
+			</view>
+		</view>
+		<view style="margin-top: 14rpx;"></view>
+		<view>
+			<view v-for="(item,index) in articles.length" :key="index" >
+				<view v-if="list[type] === articles[item].type">
+					<myTable :article="articles[item]"></myTable>
+				</view>
+			</view> 
+		</view>
+	</view>
+	
+</template>
+
+<script>
+	import myTable from '@/component/myTable.vue'
+	export default {
+		components: {
+			myTable
+		},
+		data() {
+			return {
+				type: null,
+				list: ['时政要闻', '支部动态', '微课堂展示'],
+				articles: [],
+			}
+		},
+		onLoad(options) {
+			this.type = parseInt(options.index, 10); 
+			this.articles = JSON.parse(decodeURIComponent(options.articles));
+		},
+		methods: {
+			renderIndex() {
+			  console.log(this.type);
+			  console.log(this.articles)
+			}
+		},
+		mounted() {
+		    this.renderIndex();
+		}
+	}
+</script>
+
+<style>
+.on_nav{
+	width: 70%;
+	margin-left: 15%;
+	height: 8vh; 
+	line-height: 112rpx;
+	font-size: 28rpx;
+	text-align: center;
+	border-bottom: 2px #ff6c58 solid;
+	color: #ff6c58;
+}
+.nav{
+	width: 70%;
+	margin-left: 15%;
+	height: 8vh; 
+	line-height: 112rpx;
+	font-size: 28rpx;
+	text-align: center;
+}
+.on_list{
+	height: 4vh;
+	line-height: 56rpx;
+	margin-top: 28rpx;
+	width: 20%;
+	margin-left: 2.5%;
+	margin-right: 2.5%;
+	text-align: center;
+	background-color: #ff4a32;
+	color: white;
+	font-size: 28rpx;
+}
+.list{
+	height: 4vh;
+	line-height: 56rpx;
+	margin-top: 28rpx;
+	width: 20%;
+	margin-left: 2.5%;
+	margin-right: 2.5%;
+	text-align: center;
+	background-color: #eaeaea;
+	color: #666666;
+	font-size: 28rpx;
+}
+</style>

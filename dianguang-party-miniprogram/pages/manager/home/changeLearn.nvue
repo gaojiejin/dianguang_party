@@ -1,0 +1,231 @@
+<template>
+  <view class="container">
+    <!-- 支部选择 -->
+    <view class="form-item">
+      <text class="label">选择支部：</text>
+      <picker mode="selector" :range="branchList.map(branch => branch.branch_name)" @change="onBranchChange">
+        <view class="picker">{{ selectedBranchName || '请选择支部' }}</view>
+      </picker>
+    </view>
+
+    <!-- 课程选择 -->
+    <view class="form-item">
+      <text class="label">选择课程：</text>
+      <picker mode="selector" :range="courseList.map(course => course.classTitle)" @change="onCourseChange">
+        <view class="picker">{{ selectedCourseName || '请选择课程' }}</view>
+      </picker>
+    </view>
+
+    <!-- 学习状态设置 -->
+    <view class="form-item">
+      <text class="label">设置学习状态：</text>
+      <picker mode="selector" :range="statusList" @change="onStatusChange">
+        <view class="picker">{{ selectedStatus || '请选择状态' }}</view>
+      </picker>
+    </view>
+
+    <!-- 学习时长范围输入 -->
+    <view class="form-item">
+      <text class="label">学习时长范围（秒）：</text>
+      <view class="duration-inputs">
+        <input type="number" v-model="studyDurationMin" placeholder="最小时长" />
+        <text>到</text>
+        <input type="number" v-model="studyDurationMax" placeholder="最大时长" />
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <button class="submit-btn" @click="submitForm">提交</button>
+  </view>
+</template>
+
+<script>
+import { getBase_url } from '../../../api';
+import { getClasses, getBranches, changeLearnDurationByBranch } from '@/api/api.js';
+
+export default {
+  data() {
+    return {
+      selectedBranchId: '', // 选中的支部ID
+      selectedBranchName: '', // 选中的支部名称
+      selectedCourseId: '', // 选中的课程ID
+      selectedCourseName: '', // 选中的课程名称
+      selectedStatus: '', // 选中的学习状态
+
+      // 学习时长
+      studyDurationMin: '', // 选择的学习时长最小值
+      studyDurationMax: '', // 选择的学习时长最大值
+      maxAllowedDuration: 0, // 从后端获取的最大时长
+
+      branchList: [], // 支部列表
+      courseList: [], // 课程列表
+      statusList: ['未开始', '已完成'],
+    };
+  },
+  created() {
+    this.fetchCourses();
+    this.fetchBranches();
+  },
+  methods: {
+    fetchBranches() {
+      getBranches().then(res => {
+        this.branchList = res.map(branch => ({
+          branch_id: branch.branch_id,
+          branch_name: branch.branch_name
+        }));
+        this.branchList.unshift({ branch_id: '', branch_name: "所有支部" });
+      }).catch(error => {
+        console.error('获取支部列表失败:', error);
+      });
+    },
+
+    onBranchChange(e) {
+      const selectedBranch = this.branchList[e.detail.value];
+      this.selectedBranchId = selectedBranch.branch_id;
+      this.selectedBranchName = selectedBranch.branch_name;
+    },
+
+    fetchCourses() {
+      getClasses().then(res => {
+        this.courseList = res.map(course => ({
+          classId: course.classId,
+          classTitle: course.classTitle
+        }));
+      }).catch(error => {
+        console.error('获取课程列表失败:', error);
+      });
+    },
+
+    onCourseChange(e) {
+      const selectedCourse = this.courseList[e.detail.value];
+      this.selectedCourseId = selectedCourse.classId;
+      this.selectedCourseName = selectedCourse.classTitle;
+
+      uni.request({
+        url: getBase_url() + 'classLearnInfo/getClassDuration',
+        method: 'GET',
+        data: { class_id: this.selectedCourseId },
+        success: (res) => {
+          this.studyDurationMax = res.data;
+          this.maxAllowedDuration = res.data;
+        },
+        fail: (error) => {
+          uni.showToast({ title: '获取课程最大时长失败', icon: 'none' });
+          console.error('获取课程最大时长失败:', error);
+        }
+      });
+    },
+
+    onStatusChange(e) {
+      const selectedStatus = this.statusList[e.detail.value];
+      this.selectedStatus = selectedStatus;
+    },
+
+    submitForm() {
+      if (!this.selectedBranchId && this.selectedBranchName !== "所有支部") {
+        uni.showToast({ title: '请选择支部', icon: 'none' });
+        return;
+      }
+
+      if (!this.selectedCourseId) {
+        uni.showToast({ title: '请选择课程', icon: 'none' });
+        return;
+      }
+
+      if (!this.selectedStatus) {
+        uni.showToast({ title: '请选择学习状态', icon: 'none' });
+        return;
+      }
+
+      if (!this.studyDurationMin || this.studyDurationMin <= 0 || !this.studyDurationMax || this.studyDurationMax <= 0) {
+        uni.showToast({ title: '请设置有效的学习时长范围', icon: 'none' });
+        return;
+      }
+
+      if (this.studyDurationMax > this.maxAllowedDuration) {
+        uni.showToast({ title: `最大学习时长不能超过 ${this.maxAllowedDuration} 分钟`, icon: 'none' });
+        return;
+      }
+
+      const formData = {
+        class_id: this.selectedCourseId,
+        branch_id: this.selectedBranchId || 0,
+        if_learned: this.selectedStatus === '已完成' ? 1 : 0,
+        min_duration: this.studyDurationMin,
+        max_duration: this.studyDurationMax,
+      };
+
+      console.log('提交的参数:', formData);
+
+      changeLearnDurationByBranch(formData).then(response => {
+        uni.showToast({ title: '提交成功', icon: 'success' });
+        console.log('后端响应:', response);
+      }).catch(error => {
+        uni.showToast({ title: '提交失败，请重试', icon: 'none' });
+        console.error('提交失败:', error);
+      });
+    }
+  }
+};
+</script>
+
+<style scoped>
+.container {
+  padding: 30rpx;
+  background-color: #f7f8fa;
+  border-radius: 16rpx;
+  box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.label {
+  display: block;
+  margin-bottom: 10rpx;
+  font-size: 32rpx;
+  color: #333;
+}
+
+.duration-inputs {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 20rpx;
+}
+
+input {
+  border: 2rpx solid #dcdcdc;
+  padding: 15rpx;
+  border-radius: 10rpx;
+  width: 100%;
+  height: 6vh;
+  font-size: 30rpx;
+}
+
+
+input:focus {
+  border-color: #007AFF;
+}
+
+.picker {
+  border: 2rpx solid #ddd;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  background-color: #fff;
+  box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.1);
+  font-size: 28rpx;
+}
+
+.submit-btn {
+  background: linear-gradient(90deg, #007AFF, #00C6FF);
+  color: white;
+  padding: 20rpx;
+  text-align: center;
+  border-radius: 12rpx;
+  margin-top: 30rpx;
+  font-size: 32rpx;
+  box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+</style>

@@ -1,0 +1,298 @@
+<template>
+	<view>
+		<view style="height: 6vh; line-height: 84rpx; width: 100%;">
+		      <uni-search-bar
+		        placeholder="搜索"
+		        :modelValue="searchQuery"
+				cancelButton='none'
+		        @input="onSearchInput"
+		      />
+		</view>
+		<!-- 自定义 Tab 控制区域 -->
+		<view class="tab">
+			<view v-for="(tab, index) in tabList" :key="index" :class="{active: currentTab === index}" @click="changeTab(index)" class="tabitem">
+				{{ tab }}
+				<view v-if="currentTab === index" style="height: 2px; background-color: #FF6A6A; width: 100%; margin-top: 2px;"></view>
+			</view>
+		</view>
+		<view v-for="(item,index) in courses" :key="index" >
+			<view v-if="searchQuery === '' || item.aclass.classTitle.includes(searchQuery)">
+				<view v-if="item.aclass.authority === currentTab">
+					<view style="height: 12vh; width: 100%; border-radius: 10px;  background-color: white; margin-top: 28rpx;">
+						<view style="width: 100%; height: 10vh; margin-left: 3%; margin-top: 14rpx; display: flex; flex-direction: row;">
+							<view style="margin-top: 14rpx;">
+								<u-avatar :src="item.aclass.classPortrait" shape="square" size="8vh"></u-avatar>	
+							</view>	
+							<view style="margin-top: 14rpx; margin-left: 5%; width: 45%;">
+								<view style="height: 4vh; line-height: 56rpx; font-size: 35rpx; overflow-x: auto; white-space: nowrap;">{{item.aclass.classTitle}}</view>
+								<view style="height: 4vh; line-height: 56rpx; font-size: 25.2rpx; color: gray;">{{item.aclass.department}}</view>		
+							</view>
+							<!-- 右侧按钮 -->
+							<view style="width: 20%; margin-left: 5%;">
+								<button class="btn" style="margin-top: 7rpx;"  @click="toggleExpand(index)">查看</button>
+								<button class="btn" style="margin-top: 14rpx;"  @click="delCLass(item)">删除</button>
+							</view>			
+						</view>
+					</view>
+					<transition name="expand">
+						<view v-show="expandedList[index]">
+							<view v-for="(item2,index2) in courses[index].chapterList" :key="index2">
+								<view style="width: 90%; margin-left: 5%; border-radius: 10px; height: 15vh; background-color: white; margin-top: 28rpx;">
+									<view style="height: 8vh; margin-top: 14rpx; width: 100%; display: flex; flex-direction: row;">
+										<view style="margin-top: 14rpx; width: 12%; margin-left: 5%;">
+											<u-avatar :src="item2.chapterPortrait" shape="square" size="6vh"></u-avatar>	
+										</view>
+										<view style="line-height: 112rpx; width: 48%; margin-left: 5%; font-size: 35rpx; font-weight: bold;  overflow-x: auto; white-space: nowrap;">
+										    {{item2.title}}
+										</view>
+										<view style="width: 30%; margin-top: 28rpx;">
+											<button v-if="item2.type === 1" class="btn2" @click="ToLearnImageText(item2)">查看</button>
+											<button v-else-if="item2.type === 2" class="btn2" @click="ToLearnVideo(item2)">查看</button>
+											<button v-else class="btn2" @click="ToLinkweb(item2)">查看</button>
+											
+										</view>
+									</view>
+									<view style="height: 5vh; width: 100%; display: flex; flex-direction: row">
+										<view style="width: 50%; display: flex; flex-direction: row;">
+											<view style="width: 40%; margin-left: 10%; line-height: 70rpx; color: gray;">{{item2.founder}}</view>
+											<view style="margin-left: 0%; line-height: 70rpx; color: gray;font-size: small;">{{item2.uploadTime ? item2.uploadTime.split('T')[0]:''}}</view>
+										</view>
+										<view v-if="item2.type === 1" style="width: 20%; height: 5vh; display: flex; flex-direction: row;">
+											<image src="/static/user/learn/图文.svg" style="height: 2.5vh; width: 60%; margin-top: 17.5rpx;"></image>
+											<view style="font-size: 25.2rpx; color: gray; line-height: 70rpx;">图文</view>
+										</view>
+										<view v-else-if="item.type === 2" style="width: 20%; height: 5vh; display: flex; flex-direction: row;">
+											<image src="/static/user/learn/视频.svg" style="height: 2.5vh; width: 60%; margin-top: 17.5rpx;"></image>
+											<view style="font-size: 25.2rpx; color: gray; line-height: 70rpx;">视频</view>
+										</view>
+										<view v-else style="width: 20%; height: 5vh; display: flex; flex-direction: row;">
+											<image src="/static/user/learn/链接.svg" style="height: 2.5vh; width: 60%; margin-top: 17.5rpx;"></image>
+											<view style="font-size: 25.2rpx; color: gray; line-height: 70rpx;">链接</view>
+										</view>
+										<view style="width: 30%; height: 5vh;">
+											<button class="btn2" @click="delChapter(item2)">删除</button>
+										</view>
+									</view>
+								</view>
+							</view>
+						</view>			
+					</transition>
+				</view>	
+			</view>
+		</view>
+		<view>
+			<uni-popup ref="classDialog" type="dialog">
+				<uni-popup-dialog :type="msgType" cancelText="取消" confirmText="确认删除" content="请确认是否删除该课程!" @confirm="deleteCLass(classId)"
+					></uni-popup-dialog>
+			</uni-popup>
+		</view>
+		<view>
+			<uni-popup ref="chapterDialog" type="dialog">
+				<uni-popup-dialog :type="msgType" cancelText="取消" confirmText="确认删除" content="请确认是否删除该章节!" @confirm="deleteCHapter(chapterId)"
+					></uni-popup-dialog>
+			</uni-popup>
+		</view>
+	</view>
+</template>
+
+<script>
+import { getClassesAndChapter, deleteClass, deleteChapter } from '@/api/api.js';
+import { getBase_url } from '@/api/index.js';
+
+export default {
+  data() {
+    return {
+      searchQuery: '',
+      tabList: ['党员课程', '积极分子课程'],  // 标签名称
+      index: 0,
+      expandedList: [],
+      learn_type: '',
+      isOpen: false,
+      courses: [],
+      currentTab: 0  ,// 当前选中的标签页
+	  classId: 0,
+	  chapterId: 0,
+    };
+  },
+  onLoad() {
+    getClassesAndChapter().then(res => {
+      this.courses = res
+	  console.log(res)
+    })
+  },
+  methods: {
+    handleChange(event) {
+      this.index = event.detail.value;
+      this.learn_type = this.learnRateStatistics[this.index].learn_class.classTitle;
+      this.percent = Math.round(this.learnRateStatistics[this.index].finishNum * 1000 / this.learnRateStatistics[this.index].num) / 10;
+    },
+    onSearchInput(value) {
+      this.searchQuery = value;
+    },
+    toggleExpand(index) {
+	  if (this.courses[index].chapterList.length === 0){
+		uni.showToast({
+			title: '暂无章节',
+			icon: 'none'
+		})
+		return
+	  }
+      this.expandedList[index] = !this.expandedList[index];
+      this.isOpen = !this.isOpen;
+    },
+    changeTab(index) {
+      this.currentTab = index;  // 更新当前选中的 tab，控制数据显示
+    },
+	delCLass(item){
+		this.$refs.classDialog.open()
+		this.classId = item.aclass.classId
+		console.log(item)
+		console.log(this.classId)
+	},
+	delChapter(item){
+		this.$refs.chapterDialog.open()
+		this.chapterId = item.chapterId
+		console.log(item)
+	},
+	deleteCLass(classId){
+		console.log(classId)
+		var data = {
+			class_id: classId
+		}
+		deleteClass(data).then((res) => {
+			console.log(res)
+			uni.showToast({
+				title: '删除课程成功',
+				icon: 'none'
+			})
+			getClassesAndChapter().then(res => {
+			  this.courses = res
+			  console.log(res)
+			})
+		})
+	},
+	deleteCHapter(chapterId){
+		console.log(chapterId)
+		var data = {
+			chapter_id: chapterId
+		}
+		deleteChapter(data).then((res)=>{
+			uni.showToast({
+				title: '删除章节成功',
+				icon: 'none'
+			})	
+			getClassesAndChapter().then(res => {
+			  this.courses = res
+			  console.log(res)
+			})
+		})
+	},
+	ToLearnImageText(item){
+		console.log(item)
+		uni.navigateTo({
+			url:`/pages/component/image/ImageLearn?&chapter=${encodeURIComponent(JSON.stringify(item))}`
+		})
+	},
+	ToLinkweb(item){
+		console.log(item)
+		uni.navigateTo({
+			url:`/pages/component/image/linkL?&chapter=${encodeURIComponent(JSON.stringify(item))}`
+		})
+	},
+	ToLearnVideo(item){
+		console.log(item)
+		uni.navigateTo({
+			url:`/pages/component/video/videoL?&chapter=${encodeURIComponent(JSON.stringify(item))}`
+		})
+	},
+
+  }
+};
+</script>
+
+
+
+
+<style >
+.expand-enter-active, .expand-leave-active {
+  transition: all 0.5s ease;
+}
+
+.expand-enter, .expand-leave-to /* .expand-leave-active in <2.1.8 */ {
+  max-height: 0;
+  opacity: 0;
+}
+.btn {
+	width: 100%;
+	height: 4vh;
+	background-color: #377f7f;
+	color: white;
+	font-size: 25.2rpx;
+	border: none;
+	border-radius: 5px;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+.btn2{
+	width: 60%;
+	height: 4vh;
+	margin-top: 7rpx;
+	margin-left: 20%;
+	background-color: #377f7f;
+	color: white;
+	font-size: 25.2rpx;
+	border: none;
+	border-radius: 5px;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+.btn3{
+	width: 100%;
+	height: 4vh;
+	background-color: #377f7f;
+	color: white;
+	font-size: 25.2rpx;
+	border: none;
+	border-radius: 5px;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+.active {
+	color: #FF6A6A; /* 选中时文字颜色 */
+	font-weight: bold;
+}
+
+.tab {
+	width: 100%;
+	margin-top: 14rpx;
+	display: flex;
+	flex-direction: row;
+	border-bottom: 1px solid #eaeaea;
+}
+
+.tabitem {
+	flex: 1; /* 确保每个标签均匀分布 */
+	text-align: center;
+	font-size: 14px;
+	padding-bottom: 10px;
+	color: #333;
+	position: relative; /* 保证子元素可以相对定位 */
+}
+
+.tabitem.active {
+	color: #FF6A6A;
+	font-weight: bold;
+}
+</style>

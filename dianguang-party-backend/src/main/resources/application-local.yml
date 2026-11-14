@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/dianguang_party?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: ''
+server:
+  port: 8080
+  url: http://127.0.0.1:8080
+alioss:
+  accessKey:
+    id: local-disabled
+    secret: local-disabled
+  bucketName: local-disabled

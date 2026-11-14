@@ -1,0 +1,217 @@
+<template>
+    <view>
+        <view class="title">
+            <view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+                <view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
+                <view style="line-height: 84rpx; font-weight: bold;">标题</view>
+                <input style="width: 100%; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%;" placeholder="请输入标题" type="text" v-model="title"  disabled/>    
+            </view>        
+        </view>
+        <view class="classify">
+            <view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+                <view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
+                <view style="line-height: 84rpx; font-weight: bold;">分类</view>
+                <view style="flex: 1; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%; display: flex; flex-direction: row;">
+                    <picker @change="bindPickerChange" :value="index" :range="list" v-model="type" style="width: 100%;"  disabled>
+                        <view style="width: 100%; text-align: right;">{{list[index]}}</view>
+                    </picker>
+                </view>
+            </view>        
+        </view>
+    <view>
+        <view class="publish-time">
+            <view style="align-items: center; width: 95%; margin: 0 auto; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+                <view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
+                <view style="line-height: 84rpx; font-weight: bold;">发布时间</view>
+                
+                <!-- 日期和时间选择器容器，靠右对齐 -->
+                <view style="flex: 1; display: flex; flex-direction: row; justify-content: flex-end;">
+                    <picker mode="date" v-model="date" @change="updateDate" style="background-color: #c5c5c5; border-radius: 5px; padding: 0 10px; margin-right: 5px;">
+                        <view style="width: 100%; text-align: right; color: #333; font-size: 14px;">{{ date }}</view>
+                    </picker>
+                    
+                    <!-- 添加分隔符 -->
+                    <view style="color: #ccc; margin-right: 5px;">-</view>
+                    
+                    <!-- 时间选择器，背景色和圆角 -->
+                    <picker mode="time" v-model="time" @change="updateTime" style="background-color: #c5c5c5; border-radius: 5px; padding: 0 10px;">
+                        <view style="width: 100%; text-align: right; color: #333; font-size: 14px;">{{ time }}</view>
+                    </picker>
+                </view>
+            </view>
+        </view>
+    </view>
+
+        <button class="btn" @click="submit()">重新提交</button>
+    </view>
+</template>
+
+
+
+<script>
+	import { createArticle, deleteIm, reSubmitArticle, editarticletime } from '@/api/api.js'
+	import { getBase_url } from '@/api/index.js'
+	export default {
+		data() {
+			return {
+				index: 0,
+				list: ['支部动态', '时政要闻', '微课堂展示'],
+				type: '支部动态',
+				title: '',
+				readOnly: false,
+				info: '',
+				images: [],
+				article: '',
+				articleId: 0,
+				date: '',  // 新增日期属性
+				time: '',  // 新增时间属性
+				publishTime: '' // 用于存储具体到秒的发布时间
+			}
+		},
+		onLoad(options) {
+			this.article = JSON.parse(decodeURIComponent(options.article));
+			this.title = this.article.title;
+			this.articleId = this.article.articleId;
+			this.type = this.article.type;
+			this.index = this.list.indexOf(this.type);
+			const publishDate = new Date(this.article.uploadTime);
+			this.date = publishDate.toISOString().split('T')[0];
+			this.time = `${publishDate.getHours()}:${String(publishDate.getMinutes()).padStart(2, '0')}`;
+		},
+		methods: {
+			updateDate(event) {
+				this.date = event.detail.value;
+				this.updatePublishTime();
+			},
+			updateTime(event) {
+				this.time = event.detail.value;
+				this.updatePublishTime();
+			},
+			updatePublishTime() {
+				const dateTime = new Date(`${this.date}T${this.time}:00`);
+				this.publishTime = dateTime.toISOString();
+			},
+			bindPickerChange(event) {
+				this.index = event.detail.value;
+				this.type = this.list[this.index];
+			},
+			submit() {
+				if (this.title === '') {
+					uni.showToast({
+						title: '标题不能为空',
+						icon: 'error',
+						duration: 1000
+					});
+				} else {
+					
+					const params = {
+						timestamp: this.publishTime,
+						article_id: this.article.articleId
+					};
+					editarticletime(params).then((res) => {
+						uni.showToast({
+							title: '修改成功',
+							icon: 'none',
+							duration: 2000
+						});
+						uni.navigateBack();
+						uni.navigateBack();
+						uni.navigateBack();
+						console.log(res);
+						console.log('修改时间');
+					});
+				
+				}
+			}
+		}
+	}
+</script>
+
+<style>
+@import "@/component/editor-icon.css";
+.title{
+	width: 100%;
+	height: 6vh;
+	margin-top: 28rpx;
+	background-color: white;
+}
+.classify{
+	width: 100%;
+	height: 8vh;
+}
+.brief{
+	width: 100%;
+	height: 8vh;
+	background-color: white;
+}
+.photo{
+	width: 100%;
+	background-color: white;
+	margin-top: 28rpx;
+}
+.btn{
+	width: 100%; 
+	height: 7vh; 
+	margin-top: 98rpx;
+	background-color: #fc4c34; 
+	color: white; 
+	text-align: center; 
+	position: fixed; 
+	bottom: 0;
+}
+.container{
+	width: 95%;
+	margin-left: 2.5%;
+}
+
+.page-body {
+	height: calc(100vh - var(--window-top) - var(--status-bar-height));
+}
+
+.wrapper {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.editor-wrapper {
+	height: calc(100vh - var(--window-top) - var(--status-bar-height) - 140px);
+	background: #fff;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.iconfont {
+	display: inline-block;
+	padding: 26rpx 26rpx;
+	width: 80rpx;
+	height:80rpx;
+	cursor: pointer;
+	font-size: 20px;
+}
+
+.toolbar {
+	box-sizing: border-box;
+	border-bottom: 0;
+	font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+}
+
+.ql-container {
+	flex:1;
+	box-sizing: border-box;
+	padding: 12px 15px;
+	width: 100%;
+	min-height: 30vh;
+	/* height: auto; */
+	/* height: 80%; */
+	margin-top: 20px;
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+.ql-active {
+	color: #06c;
+}
+</style>

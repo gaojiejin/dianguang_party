@@ -1,0 +1,173 @@
+<template>
+	<view>
+		<view class="nav">
+			<view class="party">
+				<picker style="width: 100%;" @change="partyChange" :value="branchIndex" :range="branch" v-model="branchType">
+					<view style="display: flex; flex-direction: row; width: 100%; height: 5vh;">{{branch[branchIndex]}}
+						<image src="/static/manager/home/下.svg" style="margin-left: 1%; margin-top: 14rpx; width: 10%; height: 3vh;"></image>
+					</view>
+				</picker>
+			</view>
+		</view>
+
+		<!-- 如果没有支部，显示提示 -->
+		<view v-if="branchs.length === 0" style="width: 100%; height: 50vh; display: flex; justify-content: center; align-items: center;">
+			<text style="font-size: 16px; color: #999;">暂时没有支部</text>
+		</view>
+
+		<!-- 支部列表展示 -->
+		<view v-for="(item, index) in branchs" :key="index" style="margin-bottom: 28rpx;">
+			<view v-if="branchType === '所有党支部' || branchType === item.branch.branchName" style="width: 100%; padding: 2vh; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); background-color: white;">
+				<view style="display: flex; flex-direction: row; align-items: center;">
+					<!-- 左侧图像 -->
+					<image src="/static/manager/home/swiper/2.jpg" style="height: 10vh; width: 30%; border-radius: 5px;"></image>
+					
+					<!-- 中间文本信息 -->
+					<view style="margin-left: 5%; flex: 1;">
+						<view style="font-size: 28rpx; font-weight: bold;">{{ item.branch.branchName }}</view>
+						<view v-if="item.secretary" style="font-size: 22.4rpx; margin-top: 17.5rpx; color: #333;">书记 : {{ item.secretary.name }}</view>
+						<view v-else style="font-size: 22.4rpx; margin-top: 17.5rpx; color: #666;">暂无书记</view>
+						<view style="font-size: 21rpx; color: darkgray; margin-top: 17.5rpx;">{{ item.branch.department }}</view>
+					</view>
+					
+					<!-- 右侧按钮 -->
+					<view style="width: 20%;">
+						<button class="btn" @click="check(index)">查看</button>
+						<button class="btn" style="margin-top: 14rpx;"  @click="deleteB(index)">删除</button>
+					</view>				
+				</view>
+			</view>
+		</view>
+
+		<view>
+			<uni-popup ref="alertDialog" type="dialog">
+				<uni-popup-dialog :type="msgType" cancelText="取消" confirmText="确认删除" content="请确认是否删除!" @confirm="del()"
+					></uni-popup-dialog>
+			</uni-popup>
+		</view>
+		
+		<view style="height: 8vh;"></view>
+		<button class="newParty" @click="addParty()">新建党支部</button>
+	</view>
+</template>
+
+<script>
+	import { getBranchManage, deleteBranch } from '@/api/api.js'
+	export default {	
+		data(){
+			return{
+				branchs: [], // 支部列表
+				branchIndex: 0,
+				branch: [], // 用于筛选的支部名称列表
+				branchType: '所有党支部',
+				selectedBranch: '',
+				index: 0,
+			}
+		},
+		onLoad() {
+			this.branch = []
+			this.branch.push('所有党支部')
+		},
+		onShow() {
+			// 获取支部管理数据
+			getBranchManage().then((res)=> {
+				console.log(res)
+				this.branchs = res
+				this.branchs.map(item => this.branch.push(item.branch.branchName))
+			})
+		},
+		methods: {
+		    partyChange: function(event) {
+				console.log(event)
+				this.branchIndex = event.detail.value;
+				this.branchType = this.branch[this.branchIndex]
+		    },
+			check(index){
+				uni.navigateTo({
+					url:`/pages/manager/home/partyDetail?branch=${encodeURIComponent(JSON.stringify(this.branchs[index]))}`
+				})
+			},
+			addParty(){
+				uni.navigateTo({
+					url:`/pages/component/party/addParty`
+				})
+			},
+			deleteB(index){
+				this.index = index
+				this.$refs.alertDialog.open()
+			},
+			del(){
+				var data = {
+					branchName: this.branchs[this.index].branch.branchName
+				}
+				console.log(this.branchs[this.index])
+				console.log(data)
+				deleteBranch(data).then((res)=> {
+					console.log(res)
+					uni.showToast({
+						title: '删除支部成功',
+						icon: 'none'
+					})	
+					this.branch = []
+					this.branch.push('所有党支部')
+					getBranchManage().then((res)=> {
+						console.log(res)
+						this.branchs = res
+						this.branchs.map(item => this.branch.push(item.branch.branchName))
+					})
+				})
+			}
+		},
+	}	
+</script>
+
+<style>
+.nav{
+	width: 100%;
+	height: 5vh;
+	margin-top: 28rpx;
+	display: flex; 
+	flex-direction: row;
+}
+.party{
+	margin-left: 5%; 
+	width: 40%; 
+	height: 5vh; 
+	line-height: 70rpx; 
+	display: flex;
+	flex-direction: row;
+}
+.user{
+	margin-left: 10%;
+	width: 40%; 
+	height: 5vh; 
+	line-height: 70rpx; 
+	display: flex;
+	flex-direction: row;
+}
+.btn {
+	width: 100%;
+	height: 4vh;
+	background-color: #377f7f;
+	color: white;
+	font-size: 25.2rpx;
+	border: none;
+	border-radius: 5px;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+.newParty{
+	width: 100%;
+	height: 7vh; 
+	margin-top: 98rpx;
+	background-color: #fc4c34; 
+	color: white; 
+	text-align: center; 
+	position: fixed; 
+	bottom: 0;
+}
+</style>

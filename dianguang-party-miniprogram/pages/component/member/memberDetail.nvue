@@ -1,0 +1,273 @@
+<template>
+	<view>
+		<view class="set-line" hover-class="set-line-hover">
+			<view class="line-text">头像</view>
+			<view class="line-content">
+				<view class="line-avatar">
+					<u-avatar :src="information.portrait" mode="square" size="4vh"></u-avatar>
+				</view>			
+			</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover">
+			<view class="line-text">姓名</view>
+			<view class="line-content">
+				<input class="text" v-if="isEditing" v-model="information.name" placeholder="请输入姓名" />
+				<text v-else>{{information.name}}</text>
+			</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover">
+			<view class="line-text">学/工号</view>
+			<view class="line-content">
+				<input class="text" v-if="isEditing" v-model="information.jobId" placeholder="请输入学号" />
+				<text v-else>{{information.jobId}}</text>
+			</view>
+		</view>
+		<view v-if="information.role !== '超级管理员' || (user.role === '超级管理员')" class="set-line" hover-class="set-line-hover">
+			<view class="line-text">密码</view>
+			<view class="line-content">
+				<input class="text" v-if="isEditing" v-model="information.password" placeholder="请输入密码" />
+				<text v-else>{{information.password}}</text>
+			</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover">
+			<view class="line-text">支部名称</view>
+			<view v-if="user.role === '超级管理员'" class="line-content">
+				<view v-if="isEditing">
+					<picker :range="branches" @change="filterByBranch" style="width: 100%;">
+						<view style="display: flex; align-items: center;">
+						    <view style="display: flex; align-items: center; width: 100%; flex-direction: row; justify-content: flex-end;">
+						        {{ selectedBranch }}
+						    </view>
+						</view>
+					</picker>
+				</view>
+				<text v-else>{{this.$store.getters.getBranchName(information.branchId)}}</text>
+			</view>
+			<view v-else class="line-content">
+				<text>{{this.$store.getters.getBranchName(information.branchId)}}</text>
+			</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover">
+			<view class="line-text">手机号</view>
+			<view class="line-content">
+				<input class="text" v-if="isEditing" v-model="information.phone" placeholder="请输入手机号" />
+				<text v-else>{{information.phone}}</text>
+			</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover">
+			<view class="line-text">岗位</view>
+			<view class="line-content">
+				<input class="text" v-if="isEditing" v-model="information.post" placeholder="请输入岗位" />
+				<text v-else>{{information.post}}</text>
+			</view>
+
+		</view>
+
+		<!-- 按钮 -->
+		<view style="margin-top: 10px; display: flex;justify-content: center;align-items: center;">
+		    <button v-if="!isEditing" @click="editInformation" class="edit-button">编辑信息</button>
+		    <button v-if="isEditing" @click="saveInformation" class="save-button">保存</button>
+		    <button @click="deleteUser" class="delete-button">删除成员</button>
+		</view>
+	</view>
+</template>
+
+<script>
+	import { getBase_url } from '@/api/index.js'
+	import { getBranches } from '@/api/api.js'
+	export default {
+		data() {
+			return {
+				information: [],
+				branches: [],
+				selectedBranch: '',
+				isEditing: false,  // 控制编辑模式
+				user : '',
+			};
+		},
+		onLoad(options) {
+			getBranches().then(res => {
+			   this.branches = res.filter(branch => branch.branch_name !== '积极分子支部').map(branch => branch.branch_name); 
+			}).catch(error => {
+			    console.error('获取支部列表失败:', error);
+			});	
+			if (options.information) {
+				this.information = JSON.parse(decodeURIComponent(options.information));
+				this.selectedBranch = this.$store.getters.getBranchName(this.information.branchId)
+			} else {
+				console.error("传递的信息为空或无效");
+			}
+			this.user = this.$store.state.user
+		},
+		methods: {
+			filterByBranch(event) {
+				this.selectedBranch = this.branches[event.detail.value];
+			},			
+			editInformation() {
+				this.isEditing = true;  // 进入编辑模式
+			},
+			saveInformation() {
+				// 发送更新请求到后端保存更改
+				this.information.branchId = this.$store.getters.getBranchId(this.selectedBranch)
+				uni.request({
+					url: getBase_url() + '/user/update',
+					method: 'POST',
+					data: this.information,
+					success: (res) => {
+						console.log(res)
+						if (res.statusCode === 200 && res.data === "User updated successfully") {
+							uni.showToast({
+								title: '保存成功',
+								duration: 1000  // 提示框显示1秒
+							});
+							this.isEditing = false;  // 退出编辑模式
+						} else {
+							uni.showToast({
+								title: '保存失败',
+								icon: 'error',
+								duration: 2000
+							});
+						}
+					},
+					fail: (err) => {
+						uni.showToast({
+							title: '请求失败',
+							icon: 'error',
+							duration: 2000
+						});
+						console.error(err);
+					}
+				});
+			},
+			deleteUser() {
+				const job_id = this.information.jobId;
+				uni.showModal({
+					title: '确认删除',
+					content: '您确定要删除该用户吗？',
+					success: (modalRes) => {
+						if (modalRes.confirm) {
+							uni.request({
+								url: getBase_url() + '/user/delete?job_id=' + job_id,
+								method: 'POST',
+								success: (res) => {
+									if (res.statusCode === 200 && res.data === "User deleted successfully") {
+										uni.showToast({
+											title: '删除成功',
+											duration: 1000
+										});
+										setTimeout(() => {
+											this.information = [];
+											uni.navigateBack();
+										}, 1000);
+									} else {
+										uni.showToast({
+											title: '删除失败',
+											icon: 'error',
+											duration: 2000
+										});
+									}
+								},
+								fail: (err) => {
+									uni.showToast({
+										title: '请求失败',
+										icon: 'error',
+										duration: 2000
+									});
+									console.error(err);
+								}
+							});
+						} else if (modalRes.cancel) {
+							uni.showToast({
+								title: '操作已取消',
+								icon: 'none',
+								duration: 2000
+							});
+						}
+					}
+				});
+			}
+		}
+	}
+
+</script>
+
+<style>
+	.edit-button {
+		color: white;
+		width: 100%;
+	    background-color: green;
+		height: 5vh;
+	    border: none;
+	    font-size: 25.2rpx;
+	    cursor: pointer;
+	    border-radius: 4px;
+		margin-bottom: 14rpx;
+		
+	}
+	.save-button {
+		color: white;
+		width: 100%;
+	    background-color: red;
+		height: 5vh;
+	    border: none;
+	    font-size: 25.2rpx;
+	    cursor: pointer;
+	    border-radius: 4px;
+		margin-bottom: 14rpx;
+		
+	}
+	.delete-button {
+	    color: white;
+	    background-color: red;
+		height: 5vh;
+	    border: none;
+		width: 100%;
+	    font-size: 25.2rpx;
+	    cursor: pointer;
+	    border-radius: 4px;
+	}
+
+.line-avatar{
+	line-height: 84rpx;
+	margin-left: 90%;
+	margin-top: 14rpx;
+}
+.set-line{
+	display: flex;  
+	flex-direction: row; 
+	height: 6vh; 
+	background-color: white; 
+	margin-top: 14rpx;
+}
+.set-line-hover{
+	background-color: aliceblue;
+}
+.line-text{
+	line-height: 84rpx;
+	width: 16%;
+	margin-left: 5%;
+	font-size: 25.2rpx;
+	font-weight: bold;
+	text-align: left;
+}
+.line-content{
+	line-height: 84rpx;
+	width: 74%;
+	margin-right: 5%;
+	text-align: right;
+	font-size: 25.2rpx;
+}
+.line-image{
+	width: 20%;
+	margin-right: 5%;
+	height: 6vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+.text{
+	height: 6vh;
+	line-height: 84rpx;
+}
+</style>

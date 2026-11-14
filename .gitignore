@@ -1,0 +1,21 @@
+node_modules/
+target/
+dist/
+unpackage/
+.local/
+*.log
+.idea/
+
+# Local IDE files, private snapshots and one-off development helpers
+.hbuilderx/
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+spb20241115.sql
+implement-*.py
+mobile-redesign.py
+profile-script.tmp
+check-mobile.cjs
+__pycache__/

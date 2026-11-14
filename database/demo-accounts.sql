@@ -1,0 +1,11 @@
+SET NAMES utf8mb4;
+START TRANSACTION;
+INSERT INTO branch(branch_name,branch_dis,department,authority,create_time) SELECT '电光党建演示支部','本地功能验证专用支部','电光学院',0,NOW() WHERE NOT EXISTS(SELECT 1 FROM branch WHERE branch_name='电光党建演示支部');
+SET @branch=(SELECT branch_id FROM branch WHERE branch_name='电光党建演示支部' LIMIT 1);
+INSERT INTO user(job_id,password,name,branch_id,role,post,phone,department,grade,portrait) SELECT 'branchadmin','Demo123!','演示支部管理员',@branch,'支部管理员','支部书记','','电光学院','2026','' WHERE NOT EXISTS(SELECT 1 FROM user WHERE job_id='branchadmin');
+INSERT INTO user(job_id,password,name,branch_id,role,post,phone,department,grade,portrait) SELECT 'member','Demo123!','演示党员',@branch,'党员','普通党员','','电光学院','2026','' WHERE NOT EXISTS(SELECT 1 FROM user WHERE job_id='member');
+INSERT INTO user(job_id,password,name,branch_id,role,post,phone,department,grade,portrait) SELECT 'activist','Demo123!','演示积极分子',@branch,'积极分子','积极分子','','电光学院','2026','' WHERE NOT EXISTS(SELECT 1 FROM user WHERE job_id='activist');
+UPDATE branch SET manager_id=(SELECT id FROM user WHERE job_id='branchadmin') WHERE branch_id=@branch;
+INSERT INTO class_learn_info(user_id,class_id,if_learned,learning_duration) SELECT u.id,c.class_id,0,0 FROM user u CROSS JOIN class c WHERE u.job_id IN('branchadmin','member','activist') AND NOT EXISTS(SELECT 1 FROM class_learn_info l WHERE l.user_id=u.id AND l.class_id=c.class_id);
+INSERT INTO learn_rate(user_id,class_id,chapter_id,ifLearned,learning_duration) SELECT u.id,c.class_id,c.chapter_id,0,0 FROM user u CROSS JOIN chapter c WHERE u.job_id IN('branchadmin','member','activist') AND NOT EXISTS(SELECT 1 FROM learn_rate l WHERE l.user_id=u.id AND l.chapter_id=c.chapter_id);
+COMMIT;

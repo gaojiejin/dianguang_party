@@ -1,0 +1,267 @@
+<template>
+  <view>
+    <!-- 顶部搜索框 -->
+    <view class="search-filter">
+      <uni-search-bar
+        style="width: 100%;"
+        placeholder="搜索支部"
+        :modelValue="searchQuery"
+        cancelButton="none"
+        @input="onSearchInput"
+      />
+    </view>
+
+    <!-- 全选按钮在右上角 -->
+    <view class="select-all-container">
+      <button
+        :class="{'select-all-btn': true, 'selected': isAllSelected}"
+        @click="toggleSelectAll"
+      >
+        {{ isAllSelected ? '取消全选' : '全选' }}
+      </button>
+    </view>
+
+    <!-- 支部列表 -->
+    <scroll-view scroll-y class="branch-list">
+      <checkbox-group @change="changeCheckbox">
+        <view v-for="(item, index) in filteredBranches" :key="index" class="branch-item">
+          <view class="branch-info">
+            <!-- 选择框 -->
+            <checkbox :value="item.branch_name" :checked="item.checked" />
+
+            <!-- 支部名称 -->
+            <view class="branch-details">
+              <text class="branch-name">{{ item.branch_name }}</text>
+            </view>
+          </view>
+        </view>
+      </checkbox-group>
+    </scroll-view>
+
+    <!-- 全选与导出按钮 -->
+    <view class="footer-buttons">
+      <button class="export-btn" @click="exportBranchLearningStats">导出学习情况</button>
+    </view>
+  </view>
+</template>
+
+<script>
+import { getBranches, exportLearnRateStatistics } from '@/api/api.js'; // 获取支部的API和导出学习情况的API
+import { getBase_url } from '@/api/index.js'; // 获取基本URL
+
+export default {
+  data() {
+    return {
+      searchQuery: '', // 搜索关键字
+      branches: [], // 支部列表，API返回的数据
+      selectedBranchNames: [], // 选中的支部名称数组
+    };
+  },
+  computed: {
+    // 根据搜索条件过滤支部列表
+    filteredBranches() {
+      let branches = this.branches;
+
+      // 搜索过滤
+      if (this.searchQuery) {
+        branches = branches.filter((item) =>
+          item.branch_name.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+      }
+
+      return branches;
+    },
+
+    // 判断是否已经全选
+    isAllSelected() {
+      return this.filteredBranches.length > 0 && this.filteredBranches.every(item => item.checked);
+    },
+  },
+  onLoad() {
+    // 获取所有支部
+    getBranches().then((res) => {
+      // 初始化时为每个支部添加 checked 属性
+      this.branches = res.map(item => ({ ...item, checked: false })) || [];
+    });
+  },
+  methods: {
+    // 搜索输入事件
+    onSearchInput(value) {
+      this.searchQuery = value;
+    },
+
+    // 处理多选框变化事件
+    changeCheckbox(event) {
+      const selectedBranchNames = event.detail.value;
+      this.branches.forEach(branch => {
+        branch.checked = selectedBranchNames.includes(branch.branch_name);
+      });
+      this.selectedBranchNames = selectedBranchNames;
+    },
+
+    // 切换全选或取消全选
+    toggleSelectAll() {
+      const isSelectAll = this.isAllSelected;
+      this.filteredBranches.forEach((item) => {
+        item.checked = !isSelectAll;
+      });
+      this.selectedBranchNames = isSelectAll ? [] : this.filteredBranches.map(item => item.branch_name);
+    },
+
+    // 导出学习情况
+    exportBranchLearningStats() {
+      if (this.selectedBranchNames.length === 0) {
+        uni.showToast({
+          title: '请选择至少一个支部',
+          icon: 'none',
+        });
+        return;
+      }
+
+      // 导出学习情况请求
+      uni.request({
+        url: getBase_url() + 'classLearnInfo/exportAllLearnStats', // 后端导出的接口
+        method: 'POST',
+        header: {
+          'Content-Type': 'application/json',
+        },
+        data: this.selectedBranchNames, // 传递选中的支部名称数组
+        success: (res) => {
+          if (res.statusCode === 200 && res.data) {
+            // 使用uni.downloadFile下载文件
+            uni.downloadFile({
+              url: res.data, // 后端返回的文件下载链接
+              success: (downloadRes) => {
+                if (downloadRes.statusCode === 200) {
+                  uni.showToast({
+                    title: '文件下载成功',
+                    icon: 'success',
+                    duration: 2000,
+                  });
+                  // 自动打开下载的文件
+                  uni.openDocument({
+                    filePath: downloadRes.tempFilePath,
+                    success: () => {
+                      console.log('打开文档成功');
+                    },
+                  });
+                } else {
+                  uni.showToast({
+                    title: '文件下载失败',
+                    icon: 'none',
+                    duration: 2000,
+                  });
+                }
+              },
+              fail: () => {
+                uni.showToast({
+                  title: '文件下载失败',
+                  icon: 'none',
+                  duration: 2000,
+                });
+              },
+            });
+          } else {
+            uni.showToast({
+              title: '导出失败',
+              icon: 'none',
+              duration: 2000,
+            });
+          }
+        },
+        fail: () => {
+          uni.showToast({
+            title: '请求失败',
+            icon: 'none',
+            duration: 2000,
+          });
+        },
+      });
+    },
+  },
+};
+</script>
+
+<style scoped>
+  .search-filter {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #f0f0f0;
+  }
+
+  .select-all-container {
+	width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+  }
+
+  .select-all-btn {
+    background-color: #2196f3;
+    color: white;
+	height: 5vh;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 30%;
+    text-align: center;
+  }
+
+  .select-all-btn.selected {
+    background-color: #f44336;
+  }
+
+  .branch-list {
+    margin-top: 10px;
+    height: 65vh;
+    overflow-y: auto;
+  }
+
+  .branch-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .branch-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+  }
+
+  .branch-details {
+    margin-left: 10px;
+    flex: 1;
+  }
+
+  .branch-name {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .footer-buttons {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .export-btn {
+    background-color: #4caf50;
+    color: white;
+    padding: 12px;
+    width: 100%;
+    font-size: 18px;
+    text-align: center;
+    border-radius: 5px;
+  }
+</style>

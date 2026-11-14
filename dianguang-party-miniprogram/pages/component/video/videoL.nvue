@@ -1,0 +1,68 @@
+<template>
+	<view>
+		<view class="page-body">
+			<view class="page-section">
+				<video id="myVideo" :src=chapter.chapterVideo
+				style="width: 100%;"
+				@play="videoPlay"
+				@pause="videoPause"
+				@error="videoErrorCallback" 
+				@ended="videoEnded"
+				:danmu-list="danmuList"
+				show-mute-btn
+				enable-play-gesture
+				controls
+				></video>
+			</view>
+		</view>
+		<view style="width: 100%;">
+			<h1 style="width: 95%; margin-left: 2.5%; font-weight: bold; font-size: 30.8rpx; line-height: 42rpx; margin-top: 14rpx;">{{ chapter.title }}</h1>
+			<view style="width:95%; margin-left: 2.5%; margin-top: 14rpx; display: flex; flex-direction: row;">
+				<view style="height: 3vh; line-height: 42rpx; font-size: 25.2rpx;color: #59b4cd">
+					视频学习
+				</view>
+				<view style="height: 3vh; line-height: 42rpx; margin-left: 3%; font-size: 25.2rpx;color: gray;">
+					{{  time }}
+				</view>
+			</view>
+
+			<view v-html="chapter.content" style="width: 95%; margin-left: 2.5%; margin-top: 28rpx;"></view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import { updateLearnRate,addLearnDuration } from '@/api/api.js'
+	import { formatDate } from '@/utils/formatDate.js'
+	export default {
+		data(){
+			return{
+				chapter: '',
+				time: '',
+			}
+		},
+		onLoad(options) {
+			this.chapter = JSON.parse(decodeURIComponent(options.chapter));	
+			this.time = formatDate(this.chapter.uploadTime)
+		},
+		methods: {
+			videoErrorCallback: function (e) {
+				console.log('视频错误信息:')
+			},
+			videoPlay(){
+				console.log('视频播放');	
+			},
+			videoPause() {
+				console.log('视频暂停');
+			},
+			videoEnded() {
+				console.log('视频结束');
+			},
+		}
+	}
+
+</script>
+
+<style>
+
+</style>

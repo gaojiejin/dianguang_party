@@ -1,0 +1,103 @@
+<template><view class="m-page u-reader"><view v-if="error" class="u-state"><text>{{error}}</text><button class="m-small-button" @click="loadArticle">重新加载</button></view><template v-else-if="article.articleId"><view class="u-page-title">{{article.title}}</view><view class="u-reader-tools"><text>{{article.type}} · {{time}}</text><view><text v-for="(label,index) in ['小','标准','大']" :key="index" :class="font===index?'u-font-active':''" @click="setFont(index)">{{label}}</text></view></view><web-view v-if="article.type==='链接展示'" :src="article.content" @error="mediaError=true"/><template v-else><video v-if="article.type==='微课堂展示'" class="u-video" :src="article.videoPath" controls @error="mediaError=true"/><view v-if="mediaError" class="u-state">资源无法加载，请检查网络或联系管理员更新资源</view><view :style="{fontSize:[15,17,20][font]+'px',lineHeight:1.9}"><rich-text :nodes="content"/></view></template><view v-if="role==='超级管理员'" class="u-admin-actions"><button class="m-small-button" @click="editArticle">编辑属性</button><button class="m-small-button" @click="deletarticle">删除文章</button></view></template><view v-else class="m-empty">加载中…</view></view></template>
+<script>
+	import request from '@/api/index';
+ import {decodeLegacy,readLocal,saveLocal} from '@/utils/session';
+ import {htmlForPhone} from '@/utils/learning';
+ import { getBase_url } from '@/api/index.js';
+	import { formatDate } from '@/utils/formatDate.js'
+	export default {		
+		data(){
+			return{
+				article: {}, options:{},font:1,error:'',mediaError:false,
+				role: '',
+				content: '',
+				time: '',
+			}
+		},
+        onLoad(options) { this.options=options;this.font=readLocal('reader-font',1);this.loadArticle(); },
+		onReady: function (res) {
+			this.videoContext = uni.createVideoContext('myVideo')
+		},
+		methods: {
+            async loadArticle(){this.error='';try{const old=decodeLegacy(this.options.article);const id=this.options.article_id||old.articleId;this.article=id?await request({url:'article/queryOneArticle',method:'POST',data:{article_id:id}}):old;if(!this.article||!this.article.articleId)throw new Error('文章不存在');this.content=htmlForPhone(this.article.content);this.time=formatDate(this.article.uploadTime);this.role=this.$store.state.user.role;}catch(e){this.error=e.message||'内容加载失败'}},
+            setFont(index){this.font=index;saveLocal('reader-font',index)},
+
+		    deletarticle() {
+		        // 弹出确认框，防止误删
+		        uni.showModal({
+		            title: '确认删除',
+		            content: '你确定要删除这篇文章吗？',
+		            success: (res) => {
+		                if (res.confirm) {
+		                    // 用户点击了确认按钮，继续删除操作
+		                    uni.request({
+		                        url: getBase_url()+'article/deleteArticle', // 替换为你的实际接口地址
+		                        method: 'POST',
+		                        header: {
+		                            'Content-Type': 'application/x-www-form-urlencoded',  // 使用表单编码
+		                            'Authorization': `Bearer ${this.$store.state.user.token}`  // 假设你使用了token验证
+		                        },
+		                        data: {
+		                            article_id: this.article.articleId
+		                        },
+		                        success: (response) => {
+		                            if (response.statusCode === 200) {
+		                                // 删除成功，提示用户
+		                                uni.showToast({
+		                                    title: '文章删除成功',
+		                                    icon: 'success',
+		                                    duration: 2000
+		                                });
+		                                // 返回到上一页或者刷新当前页面列表
+		                                setTimeout(() => {
+		                                    uni.navigateBack();
+											uni.navigateBack();
+		                                }, 2000);
+		                            } else {
+		                                // 删除失败，提示用户
+		                                uni.showToast({
+		                                    title: '删除失败，请重试',
+		                                    icon: 'none',
+		                                    duration: 2000
+		                                });
+		                            }
+		                        },
+		                        fail: (error) => {
+		                            // 请求失败，提示用户
+		                            uni.showToast({
+		                                title: '请求失败，请检查网络',
+		                                icon: 'none',
+		                                duration: 2000
+		                            });
+		                        }
+		                    });
+		                }
+		            }
+		        });
+		    },
+		    editArticle() {
+		        // 将文章数据编码后作为参数传递到编辑页面
+		        const encodedArticle = encodeURIComponent(JSON.stringify(this.article));
+		        uni.navigateTo({
+		            url: `/pages/component/content/editContentPublish?article=${encodedArticle}`
+		        });
+		        console.log('编辑文章');
+		    },
+			videoErrorCallback: function (e) {
+				console.log('视频错误信息:')
+				console.log(e.target.errMsg)
+			},
+			videoPlay(){
+				console.log('视频播放');
+				
+			},
+			videoPause() {
+				console.log('视频暂停');
+			},
+			videoEnded() {
+				console.log('视频结束');
+			},
+		}
+
+	}
+</script>

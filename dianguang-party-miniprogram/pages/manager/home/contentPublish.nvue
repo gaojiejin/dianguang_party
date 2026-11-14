@@ -1,0 +1,554 @@
+<template>
+	<view>
+		<view class="title">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
+				<view style="line-height: 84rpx; font-weight: bold;">标题</view>
+				<input style="width: 85%; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%;" placeholder="请输入标题" type="text" v-model="title" />	
+			</view>		
+		</view>
+		<view class="classify">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh; display: flex; flex-direction: row;  border-bottom: 1px solid #abbedb;">
+				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
+				<view style="width: 40%; line-height: 84rpx; font-weight: bold;">分类</view>
+				<view style="width: 55%; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%; display: flex; flex-direction: row;">
+					<picker @change="bindPickerChange" :value="index" :range="list" v-model="type" style="width: 100%;" >
+						<view style="text-align: right; margin-right: 2.5%;" >{{list[index]}}</view>
+					</picker>
+				</view>
+			</view>		
+		</view>
+		<view v-if="type === '微课堂展示'" class="phone">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh;">
+				<view style="margin-left: 2.5%; line-height: 84rpx; font-weight: bold;">请上传视频</view>
+			</view>
+			<view style="width: 90%;margin-left: 5%;">
+				 <uni-file-picker
+			      v-model="Value"
+			      file-mediatype="video"			  
+			      limit="1"
+			      @progress="onProgress"
+			      @success="onSuccess"
+			      @fail="onFail"
+			      @select="onVideoSelect"
+			    ></uni-file-picker>
+			</view>
+			<view style="height: 3vh;"></view>
+		</view>
+		<view class="brief">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh; display: flex; flex-direction: row;">
+				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
+				<view style="line-height: 84rpx; font-weight: bold;">主要内容</view>
+			</view>
+		</view>
+		<picker-color :isShow="showfontColor" :bottom="0"  @callback='getColor' />
+		
+		<picker-color :isShow="showfontBackgroundColor" :bottom="0"  @callback='getBackgroundColor' />
+			
+		<view class="container">
+			<view class="page-body">
+				<view class='wrapper'>
+					<view class='toolbar' @tap="format" style="background-color:white; display: flex; flex-direction: row; flex-wrap: wrap;">
+						<view :class="formats.bold ? 'ql-active' : ''" class="iconfont icon-zitijiacu" data-name="bold">
+						</view>
+						<view :class="formats.italic ? 'ql-active' : ''" class="iconfont icon-zitixieti" data-name="italic">
+						</view>
+						<view :class="formats.underline ? 'ql-active' : ''" class="iconfont icon-zitixiahuaxian"
+							data-name="underline"></view>
+						<view :class="formats.strike ? 'ql-active' : ''" class="iconfont icon-zitishanchuxian"
+							data-name="strike"></view>
+						<!-- #ifndef MP-BAIDU -->
+						<view :class="formats.align === 'left' ? 'ql-active' : ''" class="iconfont icon-zuoduiqi"
+							data-name="align" data-value="left"></view>
+						<!-- #endif -->
+						<view :class="formats.align === 'center' ? 'ql-active' : ''" class="iconfont icon-juzhongduiqi"
+							data-name="align" data-value="center"></view>
+						<view :class="formats.align === 'right' ? 'ql-active' : ''" class="iconfont icon-youduiqi"
+							data-name="align" data-value="right"></view>
+						<view :class="formats.align === 'justify' ? 'ql-active' : ''" class="iconfont icon-zuoyouduiqi"
+							data-name="align" data-value="justify"></view>
+						<!-- #ifndef MP-BAIDU -->
+						<view :class="formats.lineHeight ? 'ql-active' : ''" class="iconfont icon-line-height"
+							data-name="lineHeight" data-value="2"></view>
+						<view :class="formats.letterSpacing ? 'ql-active' : ''" class="iconfont icon-Character-Spacing"
+							data-name="letterSpacing" data-value="2em"></view>
+						<view :class="formats.marginTop ? 'ql-active' : ''" class="iconfont icon-722bianjiqi_duanqianju"
+							data-name="marginTop" data-value="20px"></view>
+						<view :class="formats.marginBottom ? 'ql-active' : ''" class="iconfont icon-723bianjiqi_duanhouju"
+							data-name="marginBottom" data-value="20px"></view>
+						<!-- #endif -->
+			 
+						<view class="iconfont icon-clearedformat" @tap="removeFormat"></view>
+			 
+						<!-- #ifndef MP-BAIDU -->
+						<view :class="formats.fontFamily ? 'ql-active' : ''" class="iconfont icon-font"
+							data-name="fontFamily" data-value="Pacifico"></view>
+							
+						<picker @change="fontChange" :value="index" :range="font">
+							<view :class="formats.fontSize === fontSize ? 'ql-active' : ''" class="iconfont icon-fontsize"></view>
+						</picker>
+						
+		
+						<!-- #endif -->
+						<view :class="formats.color === fontColor ? fontColor : ''" class="iconfont icon-text_color"
+							 @tap="showColor"></view>
+						<view :class="formats.backgroundColor === backgroundColor ? backgroundColor : ''"
+							class="iconfont icon-fontbgcolor" @tap="showBackgroundColor"></view>
+						<view class="iconfont icon-date" @tap="insertDate"></view>
+						<view class="iconfont icon--checklist" data-name="list" data-value="check"></view>
+						<view :class="formats.list === 'ordered' ? 'ql-active' : ''" class="iconfont icon-youxupailie"
+							data-name="list" data-value="ordered"></view>
+						<view :class="formats.list === 'bullet' ? 'ql-active' : ''" class="iconfont icon-wuxupailie"
+							data-name="list" data-value="bullet"></view>
+			 
+						<view class="iconfont icon-undo" @tap="undo"></view>
+						<view class="iconfont icon-redo" @tap="redo"></view>
+			 
+						<view class="iconfont icon-outdent" data-name="indent" data-value="-1"></view>
+						<view class="iconfont icon-indent" data-name="indent" data-value="+1"></view>
+						<view class="iconfont icon-fengexian" @tap="insertDivider"></view>
+						<view class="iconfont icon-charutupian" @tap="insertImage"></view>
+		
+						<view :class="formats.header === 1 ? 'ql-active' : ''" class="iconfont icon-format-header-1"
+							data-name="header" :data-value="1"></view>
+						<view :class="formats.header === 2 ? 'ql-active' : ''" class="iconfont icon-format-header-2"
+							data-name="header" :data-value="2"></view>
+						<view :class="formats.header === 3 ? 'ql-active' : ''" class="iconfont icon-format-header-3"
+							data-name="header" :data-value="3"></view>
+						<view :class="formats.header === 4 ? 'ql-active' : ''" class="iconfont icon-format-header-4"
+							data-name="header" :data-value="4"></view>
+						<view :class="formats.header === 5 ? 'ql-active' : ''" class="iconfont icon-format-header-5"
+							data-name="header" :data-value="5"></view>
+						<view :class="formats.script === 'sub' ? 'ql-active' : ''" class="iconfont icon-zitixiabiao"
+							data-name="script" data-value="sub"></view>
+						<view :class="formats.script === 'super' ? 'ql-active' : ''" class="iconfont icon-zitishangbiao"
+							data-name="script" data-value="super"></view>
+			 
+						<view class="iconfont icon-shanchu" @tap="clear"></view>
+			 
+						<view :class="formats.direction === 'rtl' ? 'ql-active' : ''" class="iconfont icon-direction-rtl"
+							data-name="direction" data-value="rtl"></view>
+					</view>
+			 
+					<view class="editor-wrapper">
+						<editor id="editor" class="ql-container" placeholder="请输入..." show-img-size show-img-toolbar
+							show-img-resize @statuschange="onStatusChange" :read-only="readOnly" @ready="onEditorReady" @blur="blur" @input="onEditorInput">
+						</editor>
+					</view>		
+				</view>
+			</view>
+		</view>	
+		<button class="btn" @click="submit()">发 布</button>
+	</view>
+</template>
+
+<script>
+	import { createArticle,deleteIm } from '@/api/api.js'
+	import { getBase_url } from '@/api/index.js'
+	export default {
+		data (){
+			return{
+				index: 0,
+				list: ['支部动态', '时政要闻', '微课堂展示'],
+				type: '支部动态',
+				title: '',
+				readOnly: false,
+				formats: {},
+				info: '',
+				images: [],
+				
+				Value: [],
+				videoUrl: '',
+				
+				fontSize: '',
+				font: ['6px', '8px', '10px', '12px', '14px', '16px', '18px', '20px', '22px', '24px', '26px', '28px', '30px', '32px'],
+				fontColor: '',
+				backgroundColor: '',
+				
+				
+				showFontSizePicker: false,
+				showfontColor: false,
+				showfontBackgroundColor: false,
+				bottomPickerColor:0
+			}
+		},
+		onLoad() {
+
+		},
+		methods: {
+			blur(e){
+				// this.info=e.detail.html
+				// console.log(this.info,e,'失去焦点')
+			},
+			readOnlyChange() {
+				this.readOnly = !this.readOnly
+			},
+			onEditorReady() {
+				// #ifdef MP-BAIDU
+				this.editorCtx = requireDynamicLib('editorLib').createEditorContext('editor');
+				// #endif
+			 
+				// #ifdef APP-PLUS || MP-WEIXIN || H5
+				uni.createSelectorQuery().select('#editor').context((res) => {
+					this.editorCtx = res.context
+				}).exec()
+				// #endif
+			},
+			onEditorInput(e){
+				this.info=e.detail.html
+			},
+			undo() {
+				this.editorCtx.undo()
+			},
+			redo() {
+				this.editorCtx.redo()
+			},
+			format(e) {
+				let {
+					name,
+					value
+				} = e.target.dataset
+				if (!name) return
+				this.editorCtx.format(name, value)
+			},
+			onStatusChange(e) {
+				const formats = e.detail
+				this.formats = formats
+			},
+			insertDivider() {
+				this.editorCtx.insertDivider({
+					success: function() {
+						console.log('insert divider success')
+					}
+				})
+			},
+			clear() {
+				uni.showModal({
+					title: '清空编辑器',
+					content: '确定清空编辑器全部内容？',
+					success: (res) => {
+						if (res.confirm) {
+							this.editorCtx.clear({
+								success: function(res) {
+									console.log("clear success")
+								}
+							})
+						}
+					}
+				});
+			},
+			removeFormat() {
+				this.editorCtx.removeFormat()
+			},
+			insertDate() {
+				const date = new Date()
+				const formatDate = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
+				this.editorCtx.insertText({
+					text: formatDate
+				})
+			},
+			insertImage() {
+				uni.chooseImage({
+					count: 1,
+					success: (res) => {
+						this.editorCtx.insertImage({
+							src: res.tempFilePaths[0],
+							alt: '图像',
+							success: function() {
+								console.log('insert image success')
+							}
+						})
+					}
+				})
+			},
+			bindPickerChange: function(event) {
+				this.index = event.detail.value
+				this.type = this.list[this.index]
+			},
+			onProgress(event){
+				console.log('process')
+			},
+			onSuccess(res){
+				console.log('success')
+			},
+			onFail(err){
+				console.log('fail')
+			},
+			onVideoSelect(res){
+				console.log(res.tempFilePaths[0])
+				this.videoUrl = res.tempFilePaths[0]
+			},
+			showColor(){
+				this.showfontColor = true
+			},
+			showBackgroundColor(){
+				this.showfontBackgroundColor = true
+			},
+			fontChange: function(event) {
+			    this.fontSize = this.font[event.detail.value];
+			    this.$nextTick(() => {
+			        this.editorCtx.format('fontSize', this.fontSize);
+			    });
+			    console.log('字体大小设置为:', this.fontSize);
+			},
+			getColor(res){
+				this.fontColor = res || null
+				this.$nextTick(() => {
+					this.editorCtx.format('color', this.fontColor);
+				});
+				console.log(this.fontColor)
+				this.showfontColor = false
+			},
+			getBackgroundColor(res){
+				this.backgroundColor = res || null
+				this.$nextTick(() => {
+					this.editorCtx.format('backgroundColor', this.backgroundColor);
+				});
+				this.showfontBackgroundColor = false				
+			},
+			submit(){
+				if (this.title === ''){
+					uni.showToast({
+						title: '标题不能为空',
+						icon: 'error',
+						duration: 1000
+					})
+				}
+				else if (this.type === '微课堂展示' && this.videoUrl === ''){
+					uni.showToast({
+						title: '请上传视频',
+						icon: 'error',
+						duration: 1000
+					})
+				}
+				else{
+					console.log(this.info)
+					const imageUrls = this.extractImageUrls(this.info);
+					const newUrls = [];
+					if (imageUrls.length > 0) {
+						// 创建一个数组来存储每个上传操作的 Promise
+						const uploadPromises = imageUrls.map((imageUrl, index) => {
+							return new Promise((resolve, reject) => {
+								uni.uploadFile({
+									url: getBase_url() + 'class/upload',  // 替换成你的图片上传接口地址
+									filePath: imageUrl,
+									name: 'url',
+									success: (res) => {
+										this.images.push(res.data);
+										this.info = this.info.replace(new RegExp(imageUrl, 'g'), res.data);
+										resolve(res.data);
+									},
+									fail: (error) => {
+										console.error('上传失败:', error);
+										reject(error);  // 上传失败时，调用 reject
+									}
+								});
+							});
+						});
+						// 使用 Promise.all 来等待所有上传操作完成
+						Promise.all(uploadPromises)
+							.then((results) => {
+								console.log('所有文件上传完成:', results);
+								var data = {
+									title: this.title,
+									type: this.type,
+									content: this.info,
+									editor: this.$store.state.user.name,
+									editorId: this.$store.state.user.id,
+									imagesPath: this.images
+								}
+								if (this.type === '微课堂展示'){
+									uni.uploadFile({
+										url: getBase_url() + 'class/upload',  // 替换成你的图片上传接口地址
+										filePath: this.videoUrl,
+										name: 'url',
+										success: (res) => {
+											data['videoPath'] = res.data
+											createArticle(data).then((res)=>{
+												console.log(data)
+												uni.showToast({
+													title: "内容上传成功",
+													icon: 'none'
+												})	
+												setTimeout(() => {
+													uni.navigateBack()
+												}, 1000);
+											})
+										},
+										fail: (error) => {
+											console.error('上传失败:', error);
+											reject(error);  // 上传失败时，调用 reject
+										}
+									});
+								}
+								else{
+									createArticle(data).then((res)=>{
+										console.log(res)
+										uni.showToast({
+											title: "内容上传成功",
+											icon: 'none'
+										})	
+										setTimeout(() => {
+											uni.navigateBack()
+										}, 1000);
+									})
+								}		
+							})
+							.catch((error) => {
+								console.error('有文件上传失败:', error);
+								// 处理上传失败的情况
+							});
+					}
+					else{
+						var data = {
+							title: this.title,
+							type: this.type,
+							content: this.info,
+							editor: this.$store.state.user.name,
+							editorId: this.$store.state.user.id,
+							imagesPath: this.images,
+						}
+						if (this.type === '微课堂展示'){
+							uni.uploadFile({
+								url: getBase_url() + 'class/upload',  // 替换成你的图片上传接口地址
+								filePath: this.videoUrl,
+								name: 'url',
+								success: (res) => {
+									data['videoPath'] = res.data
+									console.log(data)
+									createArticle(data).then((res)=>{
+										console.log(res)
+										uni.showToast({
+											title: "内容上传成功",
+											icon: 'none'
+										})	
+										setTimeout(() => {
+											uni.navigateBack()
+										}, 1000);
+									})
+								},
+								fail: (error) => {
+									console.error('上传失败:', error);
+									reject(error);  // 上传失败时，调用 reject
+								}
+							});
+						}
+						else{
+							createArticle(data).then((res)=>{
+								console.log(res)
+								uni.showToast({
+									title: "内容上传成功",
+									icon: 'none'
+								})	
+								setTimeout(() => {
+									uni.navigateBack()
+								}, 1000);
+							})
+						}
+					}		
+				}
+			},
+			extractImageUrls(html) {
+			    const imgTagRegex = /<img[^>]+src="([^">]+)"/g;
+			    let match;
+			    const urls = [];
+			    while ((match = imgTagRegex.exec(html)) !== null) {
+					urls.push(match[1]);
+			    }
+				console.log(urls)
+			    return urls;
+			},
+		}
+	}
+</script>
+
+<style>
+@import "@/component/editor-icon.css";
+.title{
+	width: 100%;
+	height: 6vh;
+	margin-top: 28rpx;
+	background-color: white;
+}
+.classify{
+	width: 100%;
+	height: 8vh;
+}
+.brief{
+	width: 100%;
+	height: 8vh;
+	background-color: white;
+}
+.photo{
+	width: 100%;
+	background-color: white;
+	margin-top: 28rpx;
+}
+.btn{
+	width: 100%; 
+	height: 7vh; 
+	margin-top: 98rpx;
+	background-color: #fc4c34; 
+	color: white; 
+	text-align: center; 
+	position: fixed; 
+	bottom: 0;
+}
+.container{
+	width: 95%;
+	margin-left: 2.5%;
+}
+.phone{
+	width: 100%;
+}
+.page-body {
+	height: calc(100vh - var(--window-top) - var(--status-bar-height));
+}
+
+.wrapper {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.editor-wrapper {
+	height: calc(100vh - var(--window-top) - var(--status-bar-height) - 140px);
+	background: #fff;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.iconfont {
+	display: inline-block;
+	padding: 26rpx 26rpx;
+	width: 80rpx;
+	height:80rpx;
+	cursor: pointer;
+	font-size: 20px;
+}
+
+.toolbar {
+	box-sizing: border-box;
+	border-bottom: 0;
+	font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+}
+
+.ql-container {
+	flex:1;
+	box-sizing: border-box;
+	padding: 12px 15px;
+	width: 100%;
+	min-height: 30vh;
+	/* height: auto; */
+	/* height: 80%; */
+	margin-top: 20px;
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+.ql-active {
+	color: #06c;
+}
+</style>

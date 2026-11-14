@@ -1,0 +1,188 @@
+<template>
+	<view style="margin-left: 2.5%; width: 95%;">
+        <view v-if="article.type === '链接展示'">
+            <web-view :fullscreen="false" :src="content" ></web-view>
+        </view>
+        <view v-else>
+            <h1 style="font-weight: bold; font-size: 30.8rpx; line-height: 42rpx; margin-top: 14rpx;">{{ article.title }}</h1>
+            <view style="display: flex; flex-direction: row;">
+                <view style="margin-top: 14rpx; height: 3vh; line-height: 42rpx; font-size: 25.2rpx;color: #59b4cd">
+                    {{ article.type }}
+                </view>
+                <view style="height: 3vh; line-height: 42rpx; margin-top: 14rpx; margin-left: 3%; font-size: 25.2rpx;color: gray;">
+                    {{  time }}
+                </view>
+            </view>
+            <view style="margin-top: 28rpx;" v-if="article.type === '微课堂展示'">
+                <view class="page-body">
+                    <view class="page-section">
+                        <video id="myVideo" :src=article.videoPath
+                               style="width: 100%;"
+                               @play="videoPlay"
+                               @pause="videoPause"
+                               @error="videoErrorCallback"
+                               @ended="videoEnded"
+                               :danmu-list="danmuList"
+                               show-mute-btn
+                               enable-play-gesture
+                               controls
+                        ></video>
+                    </view>
+                </view>
+            </view>
+            <view v-html="content" style="margin-top: 28rpx;"></view>
+
+            <view v-for="(item,index) in reviewList.length" style="margin-top: 28rpx;">
+                <view style="width: 100%; border: 1px solid gray;"></view>
+                <view style="color: gray;">
+                    驳回人：{{reviewList[item].reviewerName}}
+                </view>
+                <view style="color: gray; margin-top: 14rpx; ">
+                    驳回时间：{{reviewList[item].reviewTime ? reviewList[item].reviewTime.split('T')[0] : ''}}
+                </view>
+                <view style="color: gray; margin-top: 14rpx;">
+                    驳回原因：{{reviewList[item].advice}}
+                </view>
+                <view style="width: 100%; border: 1px solid gray; margin-top: 14rpx;"></view>
+            </view>
+
+            <view style="height: 8vh;"></view>
+
+            <!-- 加判断 如果是发起人的话 可以重新申请， 如果是管理员的话 只需要看到这个文件即可 -->
+            <view v-if="role === '超级管理员'"></view>
+            <view v-else class="bottom">
+                <view class="pass" @click="dialogToggle()">重新提交申请</view>
+                <view class="reject" @click="inputDialogToggle()">撤销文件</view>
+            </view>
+
+            <view>
+                <uni-popup ref="alertDialog" type="dialog">
+                    <uni-popup-dialog :type="msgType" cancelText="取消" confirmText="重新提交" content="请确认是否要重新提交!" @confirm="Pass()"
+                    ></uni-popup-dialog>
+                </uni-popup>
+            </view>
+
+            <view>
+                <uni-popup ref="inputDialog" type="dialog">
+                    <uni-popup-dialog :type="msgType" cancelText="取消" confirmText="撤销文件" content="请确认是否要撤销文件!" @confirm="Reject()"
+                    ></uni-popup-dialog>
+                </uni-popup>
+            </view>
+        </view>
+	</view>
+</template>
+
+<script>
+	import {uploadReviewState, getReviewList, deleteArticle} from '@/api/api.js'
+	import { formatDate } from '@/utils/formatDate.js'
+	export default {
+		data(){
+			return{
+				dialogContent: '',
+				article: '',
+				reviewList: [],
+				role: '',
+				content: '',
+				time: '',
+			}
+		},
+		onLoad(options) {
+			this.article = JSON.parse(decodeURIComponent(options.article));
+			this.article = JSON.parse(decodeURIComponent(options.article));
+			this.time = formatDate(this.article.uploadTime)
+			this.content = this.article.content.replace(/\<img/gi, '<img style="max-width:100%;height:auto" ')
+			var data = {
+				article_id: this.article.articleId
+			}
+			getReviewList(data).then((res)=>{
+				console.log(res)
+				this.reviewList = res
+			})
+			this.role = this.$store.state.user.role
+		},
+		onReady: function (res) {
+			this.videoContext = uni.createVideoContext('myVideo')
+		},
+		methods: {
+			Pass(){
+				uni.navigateTo({
+					url:`/pages/component/content/reContentPublish?article=${encodeURIComponent(JSON.stringify(this.article))}`
+				})
+			},
+			dialogToggle() {
+				this.$refs.alertDialog.open()
+			},
+			inputDialogToggle() {
+				this.dialogContent = ''
+				this.$refs.inputDialog.open()
+			},
+			Reject(){
+				const data = {
+					article_id: this.article.articleId
+				}
+				deleteArticle(data).then((res)=>{
+					console.log(res)
+					uni.showToast({
+						title: "文章撤销成功",
+						icon: 'none'
+					})	
+					setTimeout(() => {
+						uni.navigateBack()
+						uni.navigateBack()
+					}, 1000);
+				})
+			},
+			videoErrorCallback: function (e) {
+				console.log('视频错误信息:')
+				console.log(e.target.errMsg)
+			},
+			videoPlay(){
+				console.log('视频播放');
+				
+			},
+			videoPause() {
+				console.log('视频暂停');
+			},
+			videoEnded() {
+				console.log('视频结束');
+			},
+		}
+	}
+</script>
+
+<style>
+.bottom{
+	width: 100%;
+	height: 7vh; 
+	margin-top: 98rpx;
+	position: fixed; 
+	bottom: 0;
+	background-color: white;
+	display: flex;
+	flex-direction: row;
+}	
+.pass{
+	width: 30%; 
+	margin-left: 10%; 
+	text-align: center; 
+	color: white;
+	background-color: #ff4a32; 
+	margin-top: 21rpx;
+	line-height: 56rpx; 
+	height: 4vh;
+	border: white solid 1px;
+	border-radius: 5px;
+}
+.reject{
+	width: 30%; 
+	margin-left: 15%; 
+	text-align: center; 
+	color: #ff4a32; 
+	background-color: white; 
+	margin-top: 21rpx;
+	line-height: 56rpx; 
+	height: 4vh;
+	border: #ff4a32 solid 1px;
+	border-radius: 5px
+}
+</style>

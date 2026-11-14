@@ -1,0 +1,171 @@
+<template><view class="m-page"><view class="m-top"><text class="m-kicker">DIANGUANG WORKSPACE</text><text class="m-title">党建工作台</text><text class="m-subtitle">让组织建设更有温度，让日常工作更高效</text></view><swiper class="m-swiper" autoplay circular indicator-dots indicator-active-color="#a32d3f"><swiper-item v-for="item in swipers" :key="item.id"><image :src="item.url" mode="aspectFit" class="m-swiper-image"/></swiper-item></swiper><view class="m-card"><text class="m-heading">内容运营</text><view class="m-shortcuts"><view v-for="(item,index) in content" :key="index" @click="contentPublish(index)"><text class="m-shortcut-symbol">{{item.title.slice(0,1)}}</text><text>{{item.title}}</text></view></view></view><view class="m-card"><text class="m-heading">组织建设</text><view class="m-shortcuts"><view v-for="(item,index) in party" :key="index" @click="partyManage(index)"><text class="m-shortcut-symbol">{{item.title.slice(0,1)}}</text><text>{{item.title}}</text></view></view></view><view class="m-card"><text class="m-heading">学习教育</text><view class="m-shortcuts"><view v-for="(item,index) in learn" :key="index" @click="learnManage(index)"><text class="m-shortcut-symbol">{{item.title.slice(0,1)}}</text><text>{{item.title}}</text></view></view></view><view class="m-read-entry" @click="openFeed">阅读党建动态 <text>查看专题内容 →</text></view><managerTabbar :managerValue="currentValue"/></view></template>
+<script>
+	import myTable from '@/component/myTable.vue'
+	import managerTabbar from '@/component/managerTabbar.vue'
+	import { queryIDNameMapping, getAllSwiper } from '@/api/api.js'
+	export default {
+		components: {
+			myTable,
+			managerTabbar,
+		},
+		data(){
+			return {
+				currentValue: 0,
+				// 轮播的图片
+				swipers: [],	
+				// content 超级管理员  content2 支部管理员
+				content:[{
+					url: '/static/manager/home/内容发布.svg',
+					title: '内容发布'
+				},
+				{
+					url: '/static/manager/home/内容审核.svg',
+					title: '内容审核'
+				},{
+					url: '/static/manager/home/轮播图管理.svg',
+					title: '轮播图管理'
+				}],		
+				party:[{
+					url: '/static/manager/home/支部管理.svg',
+					title: '支部管理'
+				},
+				{
+					url: '/static/manager/home/党员管理.svg',
+					title: '党员管理'
+				},{
+					url: '/static/manager/home/积极分子培训.svg',
+					title: '积极分子培训'
+				}],			
+				learn:[{
+					url: '/static/manager/home/课程发布.svg',
+					title: '课程发布'
+				},
+				{
+					url: '/static/manager/home/学习发布.svg',
+					title: '章节发布'
+				},
+				{
+					url: '/static/manager/home/课程管理.svg',
+					title: '课程管理'
+				},
+				{
+					url: '/static/manager/home/学习管理.svg',
+					title: '学习管理'
+				}],				
+				dotsStyles: {	
+					backgroundColor: 'rgba(255, 90, 95,0.3)',
+					border: '1px rgba(255, 90, 95,0.3) solid',
+					color: '#fff',
+					selectedBackgroundColor: 'rgba(255, 90, 95,0.9)',
+					selectedBorder: '1px rgba(255, 90, 95,0.9) solid'
+				},
+				swiperDotIndex: 0,
+				current: 0,
+				mode: 'dot',
+				// 是否自动切换轮播图
+				autoplay: true,
+				// 切换时间
+				interval: 5000,
+				// 循环切换
+				circular: true,			
+				role: '',
+			}
+		},
+		onLoad() {
+			
+		},
+		onShow() {
+			queryIDNameMapping().then((res)=>{
+				console.log(res)
+				this.$store.state.branchIdToName = res;
+			})
+			getAllSwiper().then((res)=>{
+				console.log(res)
+				this.swipers = res
+			})
+			this.role = uni.getStorageSync('role');
+			console.log(this.role)	
+		},
+		methods: { openFeed(){uni.switchTab({url:'/pages/user/home/home'})},
+			// 轮播
+			change(e) {
+				this.current = e.detail.current
+			},
+			clickItem(e) {
+				this.swiperDotIndex = e
+			},
+			contentPublish(index){
+				console.log(index)
+				if (index === 0){
+					uni.navigateTo({
+						url:`/pages/manager/home/contentPublish`
+					})
+				} else if (index === 1){
+					uni.navigateTo({
+						url:`/pages/manager/home/contentReview`
+					})
+				} else if (index === 2){
+					uni.navigateTo({
+						url:`/pages/manager/home/picPublish`
+					})
+				}		
+			},
+			partyManage(index){
+				const now = new Date();
+				const year = now.getFullYear();
+				const month = now.getMonth() + 1; // 月份是从0开始的，所以需要+1
+				const day = now.getDate();
+				const hours = now.getHours();
+				const minutes = now.getMinutes();
+				const seconds = now.getSeconds();	
+				console.log(`当前时间：${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
+				if (index === 0 ){
+					uni.navigateTo({
+						url:`/pages/manager/home/partyManage`
+					})
+				} else if (index === 1){
+					uni.navigateTo({
+						url:`/pages/manager/home/memberManage`
+					})
+				} else if (index === 2){
+					uni.navigateTo({
+						url:`/pages/manager/home/afpmanage`
+					})
+				} else if (index === 3){
+					uni.showToast({
+						title: '暂无更多内容',
+						icon: 'error',
+						duration: 1000
+					})
+				}
+			},
+			learnManage(index){
+				if (index === 0){
+					uni.navigateTo({
+						url:`/pages/manager/home/classPublish`
+					})
+				}
+				else if (index === 1){
+					uni.navigateTo({
+						url:`/pages/manager/home/learnPublish`
+					})
+				}else if (index === 2){
+					uni.navigateTo({
+						url:`/pages/manager/home/classManage`
+					})
+				} else if (index === 3){
+					uni.navigateTo({
+						url:`/pages/manager/home/learnManage`
+					})
+				} else if (index ===4){
+					uni.showToast({
+						title: '暂无更多内容',
+						icon: 'error',
+						duration: 1000
+					})
+				}
+			},
+		},
+
+	}
+</script>

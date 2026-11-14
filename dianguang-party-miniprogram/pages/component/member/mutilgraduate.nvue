@@ -1,0 +1,267 @@
+<template>
+  <view>
+    <!-- 顶部搜索框 -->
+    <view class="search-filter">
+      <uni-search-bar
+        style="width: 100%;"
+        placeholder="搜索姓名"
+        :modelValue="searchQuery"
+        cancelButton="none"
+        @input="onSearchInput"
+      />
+    </view>
+	
+	<!-- 全选与批量结业按钮 -->
+	<view class="flex-container" style="width: 160px; height: 30px; margin-top: 10px; margin-left: 75%;">
+	  <button
+	    :class="{'select-all-btn': true, 'selected': isAllSelected}"
+	    @click="toggleSelectAll"
+		style="width: 80px;"
+	  >
+	    {{ isAllSelected ? '取消全选' : '全选' }}
+	  </button>
+
+	</view>
+
+    <!-- 成员列表 -->
+    <scroll-view scroll-y class="member-list">
+      <checkbox-group @change="changeCheckbox">
+        <view v-for="(item, index) in filteredMembers" :key="item.id" class="member-item">
+          <view class="member-info">
+            <!-- 选择框 -->
+            <checkbox :value="item.id" :checked="item.checked" />
+
+            <!-- 头像与信息 -->
+            <u-avatar :src="item.portrait" shape="circle" size="4vh"></u-avatar>
+            <view class="member-details">
+              <text class="member-name">{{ item.name }}</text>
+              <text class="member-branch">{{ getBranchName(item.branchId) }}</text>
+            </view>
+          </view>
+        </view>
+      </checkbox-group>
+    </scroll-view>
+	
+
+	      <button class="graduate-btn" @click="batchGraduate">给予结业</button>
+
+  </view>
+</template>
+
+<script>
+import { getUsersByBranchID,getBranches } from '@/api/api.js'; // 获取成员的API
+import { getBase_url } from '@/api/index.js';
+export default {
+  data() {
+    return {
+      searchQuery: '', // 搜索关键字
+      members: [], // 成员列表，API返回的数据
+      selectedIds: [], // 选中的成员ID数组
+    };
+  },
+  computed: {
+    // 根据搜索条件过滤成员列表
+    filteredMembers() {
+      let members = this.members;
+
+      // 搜索过滤
+      if (this.searchQuery) {
+        members = members.filter((item) =>
+          item.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+      }
+
+      return members;
+    },
+
+    // 判断是否已经全选
+    isAllSelected() {
+      return this.filteredMembers.length > 0 && this.filteredMembers.every(item => item.checked);
+    },
+  },
+  onLoad() {
+      // 获取支部列表，查找积极分子支部的成员
+      getBranches().then((res) => {
+          // 查找“积极分子支部”的branch_id
+          const activeBranch = res.find(branch => branch.branch_name === "积极分子支部");
+          if (activeBranch) {
+              // 将积极分子支部的 branch_id 传递给接口
+              const data = { branch_id: activeBranch.branch_id };
+              getUsersByBranchID(data).then((res) => {
+                  // 初始化时为每个成员添加 checked 属性
+                  this.members = res.map(item => ({ ...item, checked: false })) || [];
+              }).catch(err => {
+                  console.error("获取成员信息失败：", err);
+              });
+          } else {
+              // 如果没有找到积极分子支部
+              uni.showToast({
+                  title: '未找到积极分子支部',
+                  icon: 'none'
+              });
+          }
+      }).catch(err => {
+          console.error("获取支部列表失败：", err);
+      });
+  },
+  methods: {
+    // 搜索输入事件
+    onSearchInput(value) {
+      this.searchQuery = value;
+    },
+
+    // 处理多选框变化事件
+    changeCheckbox(event) {
+      const selectedIds = event.detail.value;
+      this.members.forEach(member => {
+        member.checked = selectedIds.includes(member.id);
+      });
+      this.selectedIds = selectedIds;
+    },
+
+    // 切换全选或取消全选
+    toggleSelectAll() {
+      const isSelectAll = this.isAllSelected;
+      this.filteredMembers.forEach((item) => {
+        item.checked = !isSelectAll;
+      });
+      this.selectedIds = isSelectAll ? [] : this.filteredMembers.map(item => item.id);
+    },
+
+    // 批量结业操作
+    batchGraduate() {
+      if (this.selectedIds.length === 0) {
+        uni.showToast({
+          title: '请选择至少一名成员',
+          icon: 'none',
+        });
+        return;
+      }
+
+      // 批量结业请求
+      uni.request({
+        url: getBase_url()+'classLearnInfo/finishTrain', // 替换为你的后端接口地址
+        method: 'POST',
+        header: {
+          'Content-Type': 'application/json',
+        },
+        data: this.selectedIds, // 传递选中的成员ID数组
+        success: (res) => {
+          if (res.statusCode === 200) {
+            // 结业成功提示
+            uni.showToast({
+              title: res.data,
+              icon: 'success',
+            });
+          } else {
+            // 处理失败情况
+            uni.showToast({
+              title: '结业失败',
+              icon: 'none',
+            });
+          }
+        },
+        fail: (err) => {
+          uni.showToast({
+            title: '请求失败',
+            icon: 'none',
+          });
+          console.error("批量结业请求失败", err);
+        },
+      });
+    },
+
+    // 获取支部名称
+    getBranchName(branchId) {
+      return this.$store.getters.getBranchName(branchId);
+    },
+  },
+};
+</script>
+<style scoped>
+  .search-filter {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #f0f0f0;
+  }
+
+  .member-list {
+    margin-top: 0px;
+    height: 65vh;
+  }
+
+  .member-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .member-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+  }
+
+  .member-details {
+    margin-left: 10px;
+    flex: 1;
+  }
+
+  .member-name {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .member-branch {
+    font-size: 14px;
+    color: #666;
+  }
+
+  .footer-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      position: fixed;
+      bottom: 0;
+      flex-direction: row;
+      width: 100%;
+      background-color: white;
+    }
+	
+	.graduate-btn{
+		width: 100%; 
+		height: 7vh; 
+		margin-top: 98rpx;
+		background-color: #fc4c34; 
+		color: white; 
+		text-align: center; 
+		position: fixed; 
+		bottom: 0;
+	}
+
+  .select-all-btn {
+    background-color: #4caf50;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    font-size: 10px;
+    cursor: pointer;
+  }
+
+  .select-all-btn.selected {
+    background-color: #f44336;
+  }
+  
+  .flex-container{
+	  display: grid;
+	  grid-template-columns: auto auto;
+	  gap: 1px;
+	  ;
+  }
+</style>

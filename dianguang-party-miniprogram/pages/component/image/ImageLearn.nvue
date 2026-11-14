@@ -1,0 +1,38 @@
+<template>
+	<view ref="content" id="content" style="width: 95%; margin-left: 2.5%;">
+		<h1 style="font-weight: bold; font-size: 30.8rpx; line-height: 42rpx; margin-top: 14rpx;">{{ chapter.title }}</h1>
+		<view style="width:100%; margin-top: 14rpx; display: flex; flex-direction: row;">
+			<view style="height: 3vh; line-height: 42rpx; font-size: 25.2rpx;color: #59b4cd">
+				图文学习
+			</view>
+			<view style="height: 3vh; line-height: 42rpx; margin-left: 3%; font-size: 25.2rpx;color: gray;">
+				{{  time }}
+			</view>
+		</view>
+		<view v-html="content" style="width:100%; margin-top: 14rpx;"></view>
+	</view>
+</template>
+
+<script>
+	import { updateLearnRate,addLearnDuration } from '@/api/api.js'
+	import { formatDate } from '@/utils/formatDate.js'
+	export default {
+		data(){
+			return{
+				chapter: '',
+				content: '',
+				time: '',
+			}
+		},
+		onLoad(options) {
+			this.chapter = JSON.parse(decodeURIComponent(options.chapter));	
+			this.content = this.chapter.content.replace(/\<img/gi, '<img style="max-width:100%;height:auto" ')
+			this.time = formatDate(this.chapter.uploadTime)
+			console.log(this.chapter)
+		},
+	}
+</script>
+
+<style>
+	
+</style>

@@ -1,0 +1,87 @@
+<template>
+  <view>
+    <view style="height: 25vh; width: 100%; background-color: white; display: flex; flex-direction: row;">
+    	<view style="height: 20vh; margin-top: 49rpx; width: 30%; margin-left: 5%;">
+    		<l-circularProgress box-height="150" box-width="150"  progressColor="#a2ef4d" bgColor="#ff4e4e" :lineWidth="15" font-size="15" gradualColor="#a2ef4d" :percent="percent">
+    	
+    		</l-circularProgress>
+    	</view>
+    	<view style="height: 20vh; margin-top: 35rpx; width: 50%; margin-left: 5%;">
+    		<view style="height: 5vh; width: 100%; line-height: 70rpx; font-size: 35rpx; font-weight: bold; text-align: center;" >{{name}}</view>
+    		<view style="width: 75%; margin-left: 25%; text-align: center; font-size: 28rpx; margin-top: 14rpx; height: 3vh; line-height: 42rpx; display: flex; flex-direction: row; overflow-x: auto; white-space: nowrap;">
+    			{{learnRateBranchStatistics.learn_class.classTitle}}
+    		</view>
+    		<view style="width: 75%; margin-top: 14rpx; margin-left: 25%; height: 4vh; line-height: 56rpx; display: flex; flex-direction: row;" >
+    			<image src="/static/manager/home/绿圆点.png" style="height: 2vh; margin-top: 14rpx;" mode="heightFix"></image>
+    			<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">总人数</view>
+    			<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">
+    				{{learnRateBranchStatistics.num}} 人
+    			</view>	
+    		</view>
+    		<view style="width: 75%; margin-left: 25%; height: 4vh; line-height: 56rpx; display: flex; flex-direction: row;">
+    			<image src="/static/manager/home/红圆点.png"  style="height: 2vh; margin-top: 14rpx;" mode="heightFix"></image>
+    			<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">未完成</view>
+    			<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">
+    				{{learnRateBranchStatistics.num - learnRateBranchStatistics.finishNum}} 人
+    			</view>
+    		</view>
+    	</view>
+    </view>
+	<view style="width: 100%; background-color: white; margin-top: 28rpx;">
+		<view style="height: 4vh; width: 90%; margin-left: 5%; font-size: 21rpx; color: gray; border-bottom: 1px solid gray; line-height: 56rpx;">支部成员</view>
+		<view v-for="(item,index) in learnRateBranchStatistics.userStatistics" :key="index" >
+			<view style="width: 90%; margin-left: 5%; border-bottom: 1px solid gray; height: 6vh; display: flex; flex-direction: row;">
+				<view style="margin-top: 14rpx;">
+					<u-avatar :src="item.user.portrait" size="4vh"></u-avatar>
+				</view>
+				<view style="width: 80%; margin-left: 5%; line-height: 84rpx; font-size: 25.2rpx;">
+					{{item.user.name}}
+				</view>
+				<image v-if="!item.ifLearned" src="/static/manager/home/红圆点.png" style="height: 2vh; margin-top: 28rpx;" mode="heightFix"></image>
+				<image v-else src="/static/manager/home/绿圆点.png" style="height: 2vh; margin-top: 28rpx;" mode="heightFix"></image>
+			</view>
+		</view>
+	</view>
+  </view>
+</template>
+
+<script>
+import { getLearnRateBranchStatistics } from '@/api/api.js'
+export default {
+  data() {
+    return {
+      class_id: '',
+      branch_id: '',
+      percent: 0,
+      learnRateBranchStatistics: ''
+    };
+  },
+  onLoad(options) {
+    this.class_id = JSON.parse(decodeURIComponent(options.class_id));
+    this.branch_id = JSON.parse(decodeURIComponent(options.branch_id));
+    var data = {
+      class_id: this.class_id,
+      branch_id: this.branch_id
+    };
+    getLearnRateBranchStatistics(data).then((res) => {
+      if (res !== null) {
+        this.learnRateBranchStatistics = res;
+        this.percent = Math.round(this.learnRateBranchStatistics.finishNum * 1000 / this.learnRateBranchStatistics.num) / 10;
+      }
+    });
+  },
+  methods: {
+	  
+  },
+};
+
+</script>
+
+<style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+  opacity: 0;
+}
+</style>

@@ -1,0 +1,243 @@
+<template>
+	<view>
+		<!-- 顶部展示学习统计部分 -->
+		<view style="height: 25vh; width: 100%; background-color: white; display: flex; flex-direction: row;">
+			<view style="height: 20vh; margin-top: 49rpx; width: 30%; margin-left: 5%;">
+				<!-- 如果有数据，则显示进度条 -->
+				<l-circularProgress v-if="percent !== null && percent !== undefined" 
+					box-height="150" 
+					box-width="150"  
+					progressColor="#1684fc" 
+					:lineWidth="15" font-size="15" 
+					gradualColor="#1684fc" 
+					:percent="percent">
+				</l-circularProgress>
+			</view>
+			<view style="height: 20vh; margin-top: 35rpx; width: 50%; margin-left: 5%;">
+				<view style="height: 5vh; width: 100%; line-height: 70rpx; font-size: 35rpx; font-weight: bold; text-align: center;">{{ name }}</view>
+				
+				<view style="width: 75%; margin-top: 14rpx; margin-left: 25%; height: 4vh; line-height: 56rpx; display: flex; flex-direction: row;">
+					<image src="/static/manager/home/蓝圆点.png" style="height: 2vh; margin-top: 14rpx;" mode="heightFix"></image>
+					<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">总章节</view>
+					<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">{{ learnRateBranchStatistics.num }} 章节</view>
+				</view>
+				<view style="width: 75%; margin-left: 25%; height: 4vh; line-height: 56rpx; display: flex; flex-direction: row;">
+					<image src="/static/manager/home/灰圆点.png" style="height: 2vh; margin-top: 14rpx;" mode="heightFix"></image>
+					<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">未完成</view>
+					<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">{{ learnRateBranchStatistics.num - learnRateBranchStatistics.finishNum }} 章节</view>
+				</view>
+				<view style="width: 75%; margin-left: 25%; height: 4vh; line-height: 56rpx; display: flex; flex-direction: row;">
+					<image src="/static/manager/home/灰圆点.png" style="height: 2vh; margin-top: 14rpx;" mode="heightFix"></image>
+					<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">已学习时长:</view>
+					<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">{{ learnRateBranchStatistics.finishNum }} 小时</view>
+				</view>
+			</view>
+		</view>
+		
+		<!-- 个人信息展示 -->
+		<view class="personal-info">
+			<view class="personal-info-title">个人信息</view>
+			<view class="personal-info-item">
+				<text>姓名: {{ information.name }}</text>
+			</view>
+			<view class="divider"></view> <!-- 分隔线 -->
+			<view class="personal-info-item">
+				<text>角色: {{ information.role }}</text>
+			</view>
+			<view class="divider"></view> <!-- 分隔线 -->
+			<view class="personal-info-item">
+				<text>部门: {{ information.department }}</text>
+			</view>
+		</view>
+
+		<!-- 积极分子信息 -->
+		<view style="margin-top: 10px; display: flex; justify-content: center; align-items: center;">
+		    <button @click="graduate" class="edit-button">给予结业</button>
+			<button @click="deleteUser" class="delete-button">删除成员</button> 
+		</view>
+
+		<managerTabbar :managerValue="currentValue" style="height: 3vh; margin-top: 42rpx;"></managerTabbar>
+	</view>
+</template>
+
+<script>
+	import { getBase_url } from '@/api/index.js';
+	import { getOwnLearnInfo } from '@/api/api.js'
+	import managerTabbar from '@/component/managerTabbar.vue'
+
+	export default {
+		components: {
+			managerTabbar
+		},
+		data() {
+			return {
+				name: '学习情况',  
+				percent: 0,  // 初始进度为0
+				learnRateBranchStatistics: {
+					num: 0,  // 初始总章节为0
+					finishNum: 0  // 初始已完成章节为0
+				},
+				information: {
+					name: '',
+					role: '',
+					department: ''
+				}
+			}
+		},
+		onLoad(options) {
+			if (options.information) {
+				this.information = JSON.parse(decodeURIComponent(options.information));
+			} else {
+				console.error("传递的信息为空或无效");
+			}
+		},
+		onShow() {
+			var data = {
+				user_id: this.information.id
+			}
+			
+			getOwnLearnInfo(data).then((res) => {
+				console.log(res)
+				
+				// 更新章节信息
+				this.learnRateBranchStatistics.num = res.shouldLearned;
+				this.learnRateBranchStatistics.finishNum = res.alreadyLearned;
+
+				// 计算进度百分比，确保shouldLearned不为0
+				if (res.shouldLearned > 0) {
+					this.percent = Math.round(res.alreadyLearned * 1000 / res.shouldLearned) / 10;
+				} else {
+					this.percent = 0;
+				}
+			}).catch((err) => {
+				console.error("获取学习信息失败", err);
+			});
+		},
+		methods: {
+			graduate() {
+				const users_id = [this.information.id];  // 将当前用户id封装到数组中
+
+				// 使用uni.request直接发送请求
+				uni.request({
+					url: getBase_url()+'classLearnInfo/finishTrain',  // 替换为你的接口地址
+					method: 'POST',
+					header: {
+						'Content-Type': 'application/json'  // 设置请求头
+					},
+					data: users_id,  // 传递用户id数组
+					success: (res) => {
+						if (res.statusCode === 200 && res.data === '完成结业，账号已删除') {
+							console.log(res)
+							uni.showToast({
+								title: res.data,
+								icon: 'success'
+							});
+						} else {
+							uni.showToast({
+								title: res.data,
+								icon: 'none'
+							});
+							console.error("结业请求失败", res);
+						}
+					},
+					fail: (err) => {
+						uni.showToast({
+							title: '请求失败',
+							icon: 'none'
+						});
+						console.error("请求失败", err);
+					}
+				});
+			},
+			deleteUser() {
+				console.log(this.information.jobId)
+				const job_id = this.information.jobId;
+				uni.showModal({
+					title: '确认删除',
+					content: '您确定要删除该用户吗？',
+					success: (modalRes) => {
+						if (modalRes.confirm) {
+							uni.request({
+								url: getBase_url() + '/user/delete?job_id=' + job_id,
+								method: 'POST',
+								success: (res) => {
+									if (res.statusCode === 200 && res.data === "User deleted successfully") {
+										uni.showToast({
+											title: '删除成功',
+											duration: 1000
+										});
+										setTimeout(() => {
+											this.information = [];
+											uni.navigateBack();
+										}, 1000);
+									} else {
+										uni.showToast({
+											title: '删除失败',
+											icon: 'error',
+											duration: 2000
+										});
+									}
+								},
+								fail: (err) => {
+									uni.showToast({
+										title: '请求失败',
+										icon: 'error',
+										duration: 2000
+									});
+									console.error(err);
+								}
+							});
+						} else if (modalRes.cancel) {
+							uni.showToast({
+								title: '操作已取消',
+								icon: 'none',
+								duration: 2000
+							});
+						}
+					}
+				});
+			}
+		}
+	}
+</script>
+
+
+<style scoped>
+	.personal-info {
+		background-color: #fff;
+		border: 1px solid #e0e0e0;
+		border-radius: 8px;
+		padding: 16px;
+		margin: 16px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+	.personal-info-title {
+		font-size: 28rpx;
+		font-weight: bold;
+		margin-bottom: 14rpx;
+	}
+	.personal-info-item {
+		margin-bottom: 14rpx;
+		font-size: 25.2rpx;
+	}
+	.divider {
+		width: 100%;
+		height: 1px;
+		background-color: #e0e0e0;
+		margin: 1vh 0;
+	}
+	.edit-button, .delete-button {
+			color: white;
+			width: 50%;
+		    background-color: green;
+		    border: none;
+		    padding: 0.5vh 1vh;
+		    font-size: 25.2rpx;
+		    cursor: pointer;
+		    border-radius: 4px;
+			margin-bottom: 14rpx;
+		}
+		.delete-button {
+			background-color: red;
+		}
+</style>

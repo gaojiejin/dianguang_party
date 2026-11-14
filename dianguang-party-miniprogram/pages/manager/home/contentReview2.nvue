@@ -1,0 +1,95 @@
+<template>
+	<view>
+		<view style="height: 8vh; width: 100%; display: flex; flex-direction: row; border-bottom: 1px #abbedb solid; background-color: white;">
+			<view style="width: 33%;">
+				<view :class="[type === 0 ? 'on_nav' : 'nav']" @click="type = 0">待审核</view>
+			</view>
+			<view style="width: 33%;">
+				<view :class="[type === 1 ? 'on_nav' : 'nav']" @click="type = 1">已审核</view>
+			</view>
+			<view style="width: 33%;">
+				<view :class="[type === 2 ? 'on_nav' : 'nav']" @click="type = 2">已驳回</view>
+			</view>
+		</view>
+		<view style="margin-top: 14rpx;"></view>
+		<view>
+			<view v-if="type === 0">
+				<view v-if="filteredArticles(0).length === 0" style="text-align: center; padding: 20px; color: gray;">
+				    暂时无内容
+				</view>
+				<view v-for="(item, index) in filteredArticles(0)" :key="index">
+					<reviewTable :article="item"></reviewTable>
+				</view>
+			</view>
+
+			<view v-else-if="type === 1">
+				<view v-if="filteredArticles(1).length === 0" style="text-align: center; padding: 20px; color: gray;">暂时无内容</view>
+				<view v-for="(item, index) in filteredArticles(1)" :key="index">
+					<myTable :article="item"></myTable>
+				</view>
+			</view>
+		
+			<view v-else-if="type === 2">
+				<view v-if="filteredArticles(2).length === 0" style="text-align: center; padding: 20px; color: gray;">暂时无内容</view>
+				<view v-for="(item, index) in filteredArticles(2)" :key="index">
+					<rejectTable :article="item"></rejectTable>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import reviewTable from '@/component/reviewTable.vue'
+	import myTable from '@/component/myTable.vue'
+	import rejectTable from '@/component/rejectTable.vue'
+	import {queryAllArticle, queryArticleById} from '@/api/api.js'
+	export default {
+		data() {
+			return{
+				type: 0,	
+				articles: [],
+			}
+		},
+		components: {
+			reviewTable,
+			myTable,
+			rejectTable
+		},
+		onLoad() {
+			var data = {
+				editor_id: this.$store.state.user.id
+			}
+			queryArticleById(data).then((res)=>{
+				console.log(res)
+				this.articles = res
+			})
+		},
+		methods: {
+		    filteredArticles(reviewState) {
+		        return this.articles.filter(item => item.reviewState === reviewState);
+		    }
+		}
+	}
+</script>
+
+<style>
+.on_nav{
+	width: 70%;
+	margin-left: 15%;
+	height: 8vh; 
+	line-height: 112rpx;
+	font-size: 28rpx;
+	text-align: center;
+	border-bottom: 2px #ff6c58 solid;
+	color: #ff6c58;
+}
+.nav{
+	width: 70%;
+	margin-left: 15%;
+	height: 8vh; 
+	line-height: 112rpx;
+	font-size: 28rpx;
+	text-align: center;
+}
+</style>

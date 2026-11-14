@@ -1,0 +1,197 @@
+<template>
+	<view>
+		<view class="title">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
+				<view style="line-height: 84rpx; font-weight: bold;">支部名称</view>
+				<input style="width: 100%; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%;" type="text" placeholder="请输入支部名称" v-model="partyTitle" />	
+			</view>		
+		</view>
+		<view class="title">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
+				<view style="line-height: 84rpx; font-weight: bold;">支部部门</view>
+				<input style="width: 100%; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%;" type="text" placeholder="请输入支部名称" v-model="department" />	
+			</view>		
+		</view>
+		<view v-if="nowUser.role === '超级管理员'" class="title">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;"></view>
+				<view style="line-height: 84rpx; font-weight: bold;">支部书记</view>
+				<input class="input-field" type="text" v-model="partySecretary" placeholder="请选择支部书记" readonly/>
+				<button class="select-btn" @click="selectSecretary">选择</button>	
+			</view>		
+		</view>
+		<view class="brief">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh; display: flex; flex-direction: row;">
+				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
+				<view style="line-height: 84rpx; font-weight: bold;">支部简介</view>
+			</view>
+			<view style="width: 90%; margin-left: 5%; margin-right: 5%; height: 20vh;">
+				<textarea
+				    style="width: 100%; overflow-y: auto;"
+				    placeholder="请输入"
+					v-model="inputBrief"
+					maxlength="-1"
+				/>
+			</view>
+		</view>
+		<button class="btn" @click="editParty()">修改支部</button>
+	</view>
+</template>
+
+<script>
+	import { getUsersByBranchID, updateBranch } from '@/api/api.js'
+	export default {
+		data(){
+			return{
+				party: [],
+				secretary: [],
+				partyTitle: '',
+				partySecretary: '',
+				department: '',
+				inputBrief: '',
+				user: {
+					user: '',
+					name: '',
+				},
+				
+				nowUser: '',
+			}
+		},
+		onLoad(options) {
+			this.party = JSON.parse(decodeURIComponent(options.party));
+			this.secretary = JSON.parse(decodeURIComponent(options.secretary));
+			this.partyTitle = this.party.branchName;
+			this.inputBrief = this.party.branchDis
+			this.department = this.party.department
+			if (this.secretary !== null){
+				this.partySecretary = this.secretary.name
+			}		
+			// 获取选择的书记信息
+			const eventChannel = this.getOpenerEventChannel();
+			eventChannel.on('selectSecretary', (data) => {
+				this.partySecretary = data.name; // 获取并设置选中的书记名字
+				this.user = data
+				console.log(this.user)
+			});
+			this.nowUser = this.$store.state.user
+		},
+		methods: {
+			editParty(){
+				uni.showModal({
+					title: '提示',
+					content: '确认要修改支部信息吗？',
+					success: (res) => {
+						if (res.confirm) {
+							console.log(this.user)
+							if (this.user.user !== ''){
+								var data = {
+									branch_name: this.party.branchName,
+									current_name: this.partyTitle,
+									manager_id: this.user.user.id,
+									branch_dis: this.inputBrief,
+									department: this.department,
+								}
+								updateBranch(data).then((res)=>{
+									uni.showToast({
+										title: '修改支部成功',
+										icon: 'none'
+									})	
+									setTimeout(() => {
+										uni.navigateBack();
+										uni.navigateBack();
+									}, 1000);	
+
+								})
+							}	
+							else{
+								var data = {
+									branch_name: this.party.branchName,
+									current_name: this.partyTitle,
+									branch_dis: this.inputBrief,
+									department: this.department,
+								}
+								updateBranch(data).then((res)=>{
+									uni.showToast({
+										title: '修改支部成功',
+										icon: 'none'
+									})	
+									setTimeout(() => {
+										uni.navigateBack();
+										uni.navigateBack();
+									}, 1000);	
+								
+								})
+							}						
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
+				})
+			},
+			// 跳转到选择支部书记页面
+			selectSecretary() {
+				uni.navigateTo({
+					url: `/pages/component/party/selectMember?party=${encodeURIComponent(JSON.stringify(this.party))}`,
+					events: {
+						// 接收来自 selectMember 页面选择的书记数据
+						selectSecretary: (data) => {
+							this.partySecretary = data.name; // 获取书记的名字
+							this.user = data; // 获取完整的用户信息
+							console.log(this.user);
+						},
+					}
+				});
+			},
+		}
+	}
+</script>
+
+<style>
+.title{
+	width: 100%;
+	height: 6vh;
+	margin-top: 28rpx;
+	background-color: white;
+}
+.brief{
+	width: 100%;
+	height: 30vh;
+	margin-top: 28rpx;
+	background-color: white;
+}
+.btn{
+	width: 100%; 
+	height: 7vh; 
+	margin-top: 98rpx;
+	background-color: #fc4c34; 
+	color: white; 
+	text-align: center; 
+	position: fixed; 
+	bottom: 0;
+}
+.input-field {
+	flex: 1; /* 自动适应宽度 */
+	height: 5vh;
+	border: 1px solid #dcdcdc;
+	border-radius: 5px;
+	margin-left: 10%;
+	padding: 0 10px;
+	background-color: #f9f9f9;
+}
+
+.select-btn {
+	width: 20%; /* 保证选择按钮不会太宽 */
+	height: 5vh;
+	background-color: #377f7f;
+	color: white;
+	font-size: 22.4rpx;
+	border-radius: 5px;
+	margin-left: 10px; /* 给按钮与输入框之间留点间距 */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+}
+</style>

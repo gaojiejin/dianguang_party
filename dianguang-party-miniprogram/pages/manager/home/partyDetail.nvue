@@ -1,0 +1,141 @@
+<template>
+	<view>
+		<!-- 支部图片 -->
+		<image style="width: 100%; height: 25vh;" src="/static/manager/home/swiper/2.jpg"></image>
+
+		<!-- 支部信息 -->
+		<view style="margin-top: 14rpx; display: flex; flex-direction: row; align-items: center; padding: 0 5%;">
+			<view style="flex: 1;">
+				<view style="font-size: 42rpx; font-weight: bold;">{{ branch.branch.branchName }}</view>
+				<view style="font-size: 25.2rpx; color: gray; margin-top: 7rpx;">{{ branch.branch.department }} | {{ branch.num }}人</view>
+				<view style="font-size: 22.4rpx; color: gray; margin-top: 7rpx;">创建时间: {{ branch.branch.createTime }}</view>
+			</view>
+			<u-avatar src="/static/manager/home/swiper/1.jpg" shape="square" size="8vh"></u-avatar>
+		</view>
+
+		<!-- 支部书记信息 -->
+		<view v-if="branch.secretary" @click="checkSecretary" style="margin-top: 28rpx; padding: 0 5%;">
+			<view style="font-size: 35rpx; font-weight: bold;">支部书记</view>
+			<view style="margin-top: 28rpx; display: flex; flex-direction: row; align-items: center;">
+				<u-avatar :src="branch.secretary.portrait" shape="square" size="8vh"></u-avatar>
+				<view style="flex: 1; margin-left: 3%;">
+					<view style="font-size: 28rpx; font-weight: bold;">{{ branch.secretary.name }}</view>
+					<view style="font-size: 22.4rpx; color: gray; margin-top: 7rpx;">{{ branch.secretary.department }}</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 支部成员信息 -->
+		<view style="width: 100%; height: 3vh; margin-top: 28rpx; display: flex; flex-direction: row; justify-content: space-between; padding: 0 5%;">
+			<view style="font-size: 35rpx; font-weight: bold;">支部成员</view>
+			<view  class="checkmember" @click="ToPartyMember">查看全部成员</view>
+			<!-- 添加成员按钮 -->
+			<!-- <button class="add-btn" @click="addMember">添加成员</button> -->
+		</view>
+
+		
+
+		<!-- 成员列表 -->
+		<view v-for="(item, index) in branch.users" :key="index">
+			<view style="margin-top: 21rpx; height: 8vh; width: 90%; margin-left: 5%; display: flex; flex-direction: row; border-bottom: 1px solid #e0e0e0; align-items: center;" @click="ToMemberDetail(index)">
+				<u-avatar :src="item.portrait" shape="square" size="7vh"></u-avatar>
+				<view style="flex: 1; margin-left: 5%;">
+					<view style="font-size: 28rpx; font-weight: bold;">{{ item.name }}</view>
+					<view style="font-size: 22.4rpx; color: gray; margin-top: 7rpx;">{{ item.department || '未知部门' }}</view>
+				</view>
+				<image src="/static/my/right.svg" style="height: 1.5vh; width: 1.5vh;"></image>
+			</view>
+		</view>
+		<view style="height: 8vh;"></view>
+		<!-- 编辑支部按钮 -->
+		<button class="btn" @click="editParty()">编辑支部</button>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				branch: [],
+				userIsAdmin: true // 假设用户是管理员
+			}
+		},
+
+		onLoad(options) {
+			this.branch = JSON.parse(decodeURIComponent(options.branch));
+			console.log(this.branch)
+		},
+		methods: {
+			editParty() {
+				uni.navigateTo({
+					url:`/pages/component/party/editParty?party=${encodeURIComponent(JSON.stringify(this.branch.branch))}&secretary=${encodeURIComponent(JSON.stringify(this.branch.secretary))}&members=${encodeURIComponent(JSON.stringify(this.branch.users))}`
+				})
+			},
+			ToPartyMember() {
+				uni.navigateTo({
+					url:`/pages/manager/home/partyMember?&branch=${encodeURIComponent(JSON.stringify(this.branch.branch))}`
+				})
+			},
+			ToMemberDetail(index) {
+				uni.navigateTo({
+					url:`/pages/component/member/memberDetail?information=${encodeURIComponent(JSON.stringify(this.branch.users[index]))}`
+				})
+			},
+			checkSecretary() {
+				uni.navigateTo({
+					url:`/pages/component/member/memberDetail?information=${encodeURIComponent(JSON.stringify(this.branch.secretary))}`
+				})
+			},
+			// 添加成员按钮功能
+			addMember() {
+				uni.navigateTo({
+					url: '/pages/component/member/addMember'
+				})
+			}
+		}
+	}
+</script>
+
+<style scoped>
+/* 编辑支部按钮样式 */
+.btn {
+	width: 100%; 
+	height: 7vh; 
+	background-color: #fc4c34; 
+	color: white; 
+	font-size: 28rpx;
+	border-radius: 5px;
+	text-align: center;
+	line-height: 98rpx;
+	position: fixed; 
+	bottom: 0;
+}
+.checkmember {
+	    padding-left: 10.5vh;
+	    margin-top: 14rpx;
+    font-size: 21rpx;
+    color: #9E9E9E;
+    position: sticky;
+}
+/* 添加成员按钮样式 */
+.add-btn {
+	background-color: #377f7f;
+	color: white;
+	border: none;
+	padding: 0vh 2vh;
+	font-size: 19.6rpx;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+/* 查看全部成员按钮样式 */
+.view-all-btn {
+	background-color: #377f7f;
+	color: white;
+	border: none;
+	padding: 1vh 2vh;
+	font-size: 25.2rpx;
+	border-radius: 4px;
+	cursor: pointer;
+}
+</style>

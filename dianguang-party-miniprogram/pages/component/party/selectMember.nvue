@@ -1,0 +1,186 @@
+<template>
+	<view>
+		<!-- 筛选框 -->
+		<view class="fixed-header">
+			<view style="display: flex; flex-direction: row; height: 6vh; width: 100%; align-items: center;">
+				<view style="width: 50%;">
+				    <picker :range="branches" @change="filterByBranch" style="width: 100%;">
+				        <view style="line-height: 84rpx; width: 100%; display: flex; align-items: center; justify-content: center;">
+				            <view style="align-items: center; display: flex; flex-direction: row;">
+				                <view style="white-space: nowrap; display: flex; flex-direction: row;">{{ selectedBranch }}
+									<image src="/static/manager/home/下.svg" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 3vh;"></image>
+								</view>		                
+				            </view>
+				        </view>
+				    </picker>
+				</view>	
+				<view style="width: 50%;">
+					<picker :range="roles" @change="filterByRole" style="width: 100%;">
+						<view style="line-height: 84rpx; width: 100%; display: flex; align-items: center; justify-content: center;">
+						    <view style="align-items: center; display: flex; flex-direction: row;">
+						        <view style="white-space: nowrap; display: flex; flex-direction: row;">{{ selectedRole }}
+									<image src="/static/manager/home/下.svg" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 3vh;"></image>
+								</view>		                
+						    </view>
+						</view>
+					</picker>
+				</view>
+			</view>
+
+
+			<!-- 搜索框 -->
+			<view style="height: 6vh; line-height: 84rpx; width: 100%; margin-top: 0px;padding-top: 0%;">
+				<uni-search-bar
+					placeholder="搜索成员"
+					:modelValue="searchQuery"
+					cancelButton="none"
+					@input="onSearchInput"
+				/>
+			</view>
+		</view>
+
+		<!-- 成员列表 -->
+		<scroll-view scroll-y="true" class="content">
+			<view v-for="(member, index) in filteredMembers" :key="member.id" class="member-item" @click="selectMember(member)">
+				<view class="member-info">
+					<view class="member-avatar">
+						<u-avatar :src="member.portrait" shape="circle" size="4vh"></u-avatar>
+					</view>
+					<view class="member-details">
+						<text class="member-name">{{ member.name }}</text>
+						<text class="member-branch">{{ $store.getters.getBranchName(member.branchId) }}</text>
+					</view>
+					<view class="member-role">
+						<text>{{ member.role }}</text>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script>
+	import { queryAllUser, getBranches } from '@/api/api.js';
+
+	export default {
+		data(){
+			return{
+				searchQuery: '',
+				selectedBranch: '',
+				selectedRole: '所有角色',
+				members: [], // 成员列表
+				branches: [], // 支部列表
+				party: '',
+				roles: ["所有角色", "党员","积极分子","预备党员"],
+			};
+		},
+		computed: {
+			// 根据筛选条件和搜索输入过滤成员列表
+		    filteredMembers() {
+		        return this.members.filter(member => {
+		            const branchMatch = this.selectedBranch === '所有支部' || this.$store.getters.getBranchName(member.branchId) === this.selectedBranch;
+		            const roleMatch = this.selectedRole === '所有角色' || member.post === this.selectedRole;
+		            const searchMatch = this.searchQuery === '' || member.name.includes(this.searchQuery);
+		            return branchMatch && roleMatch && searchMatch;
+		        });
+		    }
+		},
+		onShow() {
+			// 获取所有成员列表
+			queryAllUser().then((res) => {
+				this.members = res;
+			}).catch(error => {
+				console.error('获取成员列表失败:', error);
+			});
+		},
+		onLoad(options) {
+			this.party = JSON.parse(decodeURIComponent(options.party));
+			this.selectedBranch = this.party.branchName
+			// 获取支部列表
+			getBranches().then(res => {
+			    this.branches = res.map(branch => branch.branch_name); 
+				this.branches.unshift("所有支部");
+			}).catch(error => {
+			    console.error('获取支部列表失败:', error);
+			});
+		},
+		methods: {
+			// 支部筛选
+			filterByBranch(event) {
+				this.selectedBranch = this.branches[event.detail.value];
+			},
+			// 角色筛选
+			filterByRole(event) {
+				this.selectedRole = this.roles[event.detail.value];
+			},
+			// 搜索成员
+			onSearchInput(value) {
+				this.searchQuery = value;
+			},
+			// 选择成员并返回到上一个页面
+			selectMember(member) {
+				// 获取上一个页面的 eventChannel
+				const eventChannel = this.getOpenerEventChannel();
+				// 使用 eventChannel 将数据返回给上一个页面
+				eventChannel.emit('selectSecretary', {
+					name: member.name,
+					user: member
+				});
+				// 返回到上一个页面
+				uni.navigateBack();
+			}
+
+		}
+	};
+</script>
+
+<style scoped>
+.fixed-header {
+	padding: 10px;
+	background-color: #f5f5f5;
+}
+
+.content {
+	padding: 10px;
+}
+
+.member-item {
+	width: 100%;
+	padding: 10px;
+	border-bottom: 1px solid #e5e5e5;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	background-color: white;
+}
+
+.member-info {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 100%;
+}
+
+.member-avatar {
+	margin-right: 10px;
+}
+
+.member-details {
+	flex: 1;
+}
+
+.member-name {
+	font-size: 28rpx;
+	font-weight: bold;
+}
+
+.member-branch {
+	font-size: 22.4rpx;
+	color: gray;
+}
+
+.member-role {
+	font-size: 22.4rpx;
+	color: #666;
+}
+</style>

@@ -1,0 +1,171 @@
+<template>
+	<view style="padding: 5%;">
+		<!-- 搜索框 -->
+		<view style="height: 6vh; line-height: 84rpx; width: 100%; margin-bottom: 28rpx;">
+			<uni-search-bar
+				placeholder="搜索"
+				:modelValue="searchQuery"
+				cancelButton="none"
+				@input="onSearchInput"
+			/>
+		</view>
+		<view v-for="(item, index) in members" :key="index" class="member-item">
+			<view v-if="searchQuery === '' || item.name.includes(searchQuery)" class="member-card">
+
+				<view class="member-content" @click="ToMemberDetail(index)">
+					<view class="member-info">
+						<u-avatar :src="item.portrait" shape="circle" size="4vh"></u-avatar>
+						<view class="member-details">
+							<text class="member-name">{{ item.name }}</text>
+							<text class="branch-name">{{ branch.branchName }}</text>
+						</view>
+					</view>
+					<view class="role-info">
+						<text class="role-name">{{ item.post }}</text>
+					</view>
+				</view>
+			</view>
+		</view>
+		<!-- 导出所有人按钮 -->
+		<!-- <view style="margin-top: 28rpx;">
+			<button @click="exportAllMembers">导出支部成员</button>
+		</view> -->
+	</view>
+</template>
+
+<script>
+	import { getUsersByBranchID, exportMembersData } from '@/api/api.js'
+	export default {
+		data() {
+			return {
+				searchQuery: '',
+				branch: '',
+				members: []
+			}
+		},
+		onLoad(options) {
+			this.branch = JSON.parse(decodeURIComponent(options.branch))
+			const data = { branch_id: this.branch.branchId }
+			getUsersByBranchID(data).then((res) => {
+				this.members = res
+			})
+		},
+		methods: {
+			onSearchInput(value) {
+				this.searchQuery = value
+			},
+			ToMemberDetail(index) {
+				uni.navigateTo({
+					url: `/pages/component/member/memberDetail?information=${encodeURIComponent(JSON.stringify(this.members[index]))}`
+				})
+			},
+			exportAllMembers() {
+				const data = this.members.map(member => ({
+					name: member.name,
+					branchName: this.branch.branchName,
+					role: member.role
+				}));
+				
+				exportMembersData(data).then((res) => {
+					if (res.success) {
+						// 通过返回的URL下载文件
+						uni.downloadFile({
+							url: res.fileUrl,
+							success: function (downloadResult) {
+								if (downloadResult.statusCode === 200) {
+									uni.saveFile({
+										tempFilePath: downloadResult.tempFilePath,
+										success: function (saveResult) {
+											uni.showToast({
+												title: '导出成功',
+												icon: 'success'
+											});
+										}
+									});
+								}
+							}
+						});
+					} else {
+						uni.showToast({
+							title: '导出失败',
+							icon: 'error'
+						});
+					}
+				});
+			}
+		}
+	}
+</script>
+
+<style>
+.member-item {
+	margin-bottom: 28rpx;
+}
+
+.member-card {
+	width: 100%;
+	padding: 3% 5%;
+	background-color: white;
+	border-radius: 8px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	position: relative; /* 允许子元素绝对定位 */
+}
+
+.member-content {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 100%;
+}
+
+.member-info {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 50%; /* 调整这个宽度使成员信息保持适当大小 */
+}
+
+.member-details {
+	margin-left: 10px; /* 头像与文字的间距 */
+}
+
+.member-name {
+	font-size: 30.8rpx;
+	font-weight: bold;
+}
+
+.branch-name {
+	font-size: 25.2rpx;
+	color: gray;
+	margin-top: 5px;
+}
+
+.role-info {
+	position: absolute;
+	right: 5%; /* 固定在容器的最右边 */
+	top: 50%;
+	transform: translateY(-50%); /* 垂直居中 */
+}
+
+.role-name {
+	font-size: 25.2rpx;
+	color: #6c757d; /* 角色的颜色，可以根据需要调整 */
+}
+
+.btn {
+	width: 25%;
+	height: 4vh;
+	background-color: #fc4c34;
+	color: white;
+	text-align: center;
+	font-size: 22.4rpx;
+	border-radius: 5px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	line-height: 56rpx;
+}
+
+</style>

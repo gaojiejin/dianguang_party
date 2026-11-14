@@ -1,0 +1,52 @@
+<template><view class="m-page"><view class="m-top"><text class="m-kicker">COURSE DETAIL</text><text class="m-title">{{course.classTitle}}</text><text class="m-subtitle">循序渐进，让学习有所收获</text></view><view class="m-card"><view class="m-section-title"><text>学习进度</text><text class="m-muted">{{percentage}}%</text></view><u-line-progress :percentage="percentage" activeColor="#a32d3f" height="12"/></view><view class="m-section-title"><text>课程章节</text><text class="m-muted">{{learnDetail.num || 0}} 节</text></view><view v-for="(item,index) in learnDetail.chapterList" :key="item.chapterId" class="m-card"><text class="m-kicker">CHAPTER {{index+1}}</text><text class="m-heading">{{item.title}}</text><view class="m-chapter-footer"><text class="m-muted">{{item.type===1?'图文学习':item.type===2?'视频学习':'链接学习'}}</text><button v-if="item.type===1" class="m-small-button" @click="ToLearnImageText(index)">开始学习</button><button v-else-if="item.type===2" class="m-small-button" @click="ToLearnVideo(index)">开始学习</button><button v-else class="m-small-button" @click="ToLinkweb(index)">开始学习</button></view></view><view v-if="!learnDetail.chapterList || !learnDetail.chapterList.length" class="m-empty">暂无章节</view></view></template>
+<script>
+	import { getUserLearnDetail } from '@/api/api.js'
+	export default {
+		data(){
+			return{
+				percentage: 0,
+				course: '',
+				learnDetail:[]
+			}
+		},
+		onLoad(options) {
+			this.course = JSON.parse(decodeURIComponent(options.course));
+			console.log(this.course)
+		},
+		onShow() {
+			var data = {
+				class_id: this.course.classId,
+				user_id: this.$store.state.user.id
+			}
+			getUserLearnDetail(data).then((res)=>{
+				console.log(res)
+				this.learnDetail = res
+				if (this.learnDetail.num === 0){
+					this.percentage = 100
+				}
+				else{
+					this.percentage = Math.round(this.learnDetail.finishNum*1000/this.learnDetail.num)/10
+				}
+				
+			})
+		},
+		methods: {
+			ToLearnImageText(index){
+				uni.navigateTo({
+					url:`/pages/component/image/ImageTextLearn?class_id=${this.course.classId}&chapter_id=${this.learnDetail.chapterList[index].chapterId}`
+				})
+			},
+			ToLinkweb(index){
+				console.log(index)
+				uni.navigateTo({
+					url:`/pages/component/image/linkweb?&&class_id=${encodeURIComponent(JSON.stringify(this.course.classId))}&chapter=${encodeURIComponent(JSON.stringify(this.learnDetail.chapterList[index]))}&ifLearned=${encodeURIComponent(JSON.stringify(this.learnDetail.chapterIfLearnedList[index]))}`
+				})
+			},
+			ToLearnVideo(index){
+				uni.navigateTo({
+					url:`/pages/component/video/videoLearn?&class_id=${encodeURIComponent(JSON.stringify(this.course.classId))}&chapter=${encodeURIComponent(JSON.stringify(this.learnDetail.chapterList[index]))}&ifLearned=${encodeURIComponent(JSON.stringify(this.learnDetail.chapterIfLearnedList[index]))}`
+				})
+			}
+		}
+	}
+</script>

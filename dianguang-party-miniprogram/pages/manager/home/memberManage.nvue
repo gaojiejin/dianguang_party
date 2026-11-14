@@ -1,0 +1,223 @@
+<template>
+	<view>
+		<!-- 筛选框 -->
+		<view class="fixed-header">
+			<view style="display: flex; flex-direction: row; height: 6vh; width: 100%; align-items: center;">
+				<view style="width: 50%;">
+				    <picker :range="branches" @change="filterByBranch" style="width: 100%;">
+				        <view style="line-height: 84rpx; width: 100%; display: flex; align-items: center; justify-content: center;">
+				            <view style="align-items: center; display: flex; flex-direction: row;">
+				                <view style="white-space: nowrap; display: flex; flex-direction: row;">{{ selectedBranch }}
+									<image src="/static/manager/home/下.svg" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 3vh;"></image>
+								</view>		                
+				            </view>
+				        </view>
+				    </picker>
+				</view>
+
+
+				<view style="width: 50%;">
+					<picker :range="roles" @change="filterByRole" style="width: 100%;">
+						<view style="line-height: 84rpx; width: 100%; display: flex; align-items: center; justify-content: center;">
+						    <view style="align-items: center; display: flex; flex-direction: row;">
+						        <view style="white-space: nowrap; display: flex; flex-direction: row;">{{ selectedRole }}
+									<image src="/static/manager/home/下.svg" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 3vh;"></image>
+								</view>		                
+						    </view>
+						</view>
+					</picker>
+				</view>
+			</view>
+
+			<!-- 搜索框 -->
+			<view style="height: 6vh; line-height: 84rpx; width: 100%;">
+				<uni-search-bar
+					placeholder="搜索"
+					:modelValue="searchQuery"
+					cancelButton="none"
+					@input="onSearchInput"
+				/>
+			</view>
+		</view>
+
+		<!-- 成员列表 -->
+		<view>
+			<view v-for="(item, index) in filteredMembers" :key="item.id" class="member-item" @click="ToMemberDetail(item)" v-if="item.role !== '积极分子'">
+				<view class="member-info">
+					<view class="member-avatar">
+						<u-avatar :src="item.portrait" shape="square" size="6vh"></u-avatar>
+					</view>
+					<view class="member-details">
+						<text class="member-name">{{ item.name }}</text>
+						<text class="member-branch">{{ $store.getters.getBranchName(item.branchId) || '无支部' }}</text>
+					</view>
+					<view class="member-role">
+						<text>{{ item.role }}</text>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<view style="margin-top: 112rpx;"></view>
+		<!-- 底部按钮 -->
+		<view style="display: flex; flex-direction: row; position: fixed; bottom: 0; width: 100%; box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);">
+		  <button class="btn1" @click="muitiladdMembers()">批量添加</button>
+		  <button class="btn2" @click="addMember()">添加党员</button>
+		</view>
+
+	</view>
+</template>
+
+<script>
+	import { queryAllUser, getBranches, getRoles,getPartyUser } from '@/api/api.js'
+	export default {
+		data(){
+			return{
+				searchQuery: '',
+				selectedBranch: '所有支部',
+				selectedRole: '所有角色',
+				members: [],
+				branches: [],
+				roles: ["所有角色", "党员","支部管理员","超级管理员"],
+			}
+		},
+		computed: {
+		    filteredMembers() {
+		        return this.members.filter(member => {
+		            const branchName = this.$store.getters.getBranchName(member.branchId) || '无支部';  // 处理无支部情况
+		            const branchMatch = this.selectedBranch === '所有支部' || branchName === this.selectedBranch;
+		            const roleMatch = this.selectedRole === '所有角色' || member.role === this.selectedRole;
+		            const searchMatch = this.searchQuery === '' || member.name.includes(this.searchQuery);
+		            return branchMatch && roleMatch && searchMatch;
+		        });
+		    }
+		},
+		onShow() {
+			// 获取所有成员列表
+			getPartyUser().then((res)=>{
+				console.log(res)
+				this.members = res
+			})
+		},
+		onLoad() {
+			// 获取支部列表
+			getBranches().then(res => {
+			    this.branches = res.map(branch => branch.branch_name).filter(branch_name => branch_name !== '积极分子支部');; 
+				this.branches.unshift("所有支部");
+				this.branches.push("无支部")
+			}).catch(error => {
+			    console.error('获取支部列表失败:', error);
+			});	
+		},
+		methods: {
+			filterByBranch(event) {
+			        this.selectedBranch = this.branches[event.detail.value];
+			    },
+			filterByRole(event) {
+				this.selectedRole = this.roles[event.detail.value];
+			},
+
+				//跳转到添加页面
+			addMember(){
+				uni.navigateTo({
+					url:`/pages/component/member/addMember`
+				})
+			},
+				//跳转到批量添加页面
+			muitiladdMembers(){
+				console.log('tiaozhuan')
+				uni.navigateTo({
+					url:`/pages/component/member/mutiladdMembers`
+				})
+			},
+				//跳转到个人详细信息
+			ToMemberDetail(item) {
+			    console.log(JSON.stringify(item));
+			    uni.navigateTo({
+			        url: `/pages/component/member/memberDetail?information=${encodeURIComponent(JSON.stringify(item))}`
+			    });
+			},
+			//搜索成员
+			onSearchInput(value) {
+			  this.searchQuery = value;
+			 
+			},
+			
+		}
+	}
+</script>
+
+<style>
+	.fixed-header {
+		width: 100%;
+		background-color: #fff; /* 确保背景色与内容背景色一致 */
+		z-index: 1000; /* 保证固定在最前 */
+		height: 13.5vh;
+		border-bottom: 1px solid #e0e0e0; /* 增加底部边框，使其与内容分隔 */
+	}
+	.member-item {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		padding: 10px 15px;
+		border-bottom: 1px solid #e0e0e0;
+		background-color: #fff;
+		transition: background-color 0.3s;
+	}
+	.member-item:hover {
+		background-color: #f9f9f9;
+	}
+	.member-info {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		width: 100%;
+	}
+	.member-avatar {
+		margin-right: 10px;
+	}
+	.member-details {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+	.member-name {
+		font-size: 16px;
+		font-weight: 500;
+		color: #333;
+	}
+	.member-branch {
+		font-size: 14px;
+		color: #666;
+		margin-top: 3px;
+	}
+	.member-role {
+		font-size: 14px;
+		color: #999;
+		text-align: right;
+	}
+	
+	.btn1, .btn2 {
+	  width: 50%;
+	  height: 7vh;
+	  background-color: #fc4c34;
+	  color: white;
+	  text-align: center;
+	  line-height: 98rpx;
+	  font-size: 16px; /* 增大字体 */
+	  border-radius: 5px 0 0 5px; /* 圆角效果 */
+	  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+	  transition: background-color 0.3s ease; /* 背景色过渡效果 */
+	}
+	
+	.btn2 {
+	  border-left: none;
+	  border-radius: 0 5px 5px 0; /* 右侧按钮的圆角 */
+	}
+	
+	.btn1:hover, .btn2:hover {
+	  background-color: #e63b23; /* 悬停时的背景色 */
+	}
+
+</style>

@@ -1,0 +1,218 @@
+<template>
+	<view>
+		<!-- <view class="title">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
+				<view style="width: 40%; line-height: 84rpx; font-weight: bold;">所属支部</view>
+				<picker :range="partysl" @change="onBranchChange" style="width: 55%; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%;">
+					<view style="height: 100%; display: flex; align-items: center; justify-content: flex-end;flex-direction: row;">
+						{{ party }}
+						<image src="/static/manager/home/下.svg" style="margin-left: 1%; margin-top: 14rpx; width: 10%; height: 3vh;"></image>
+					</view>
+				</picker>
+			</view>		
+		</view> -->
+	
+		<view class="photo">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh; display: flex; flex-direction: row;">
+				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
+				<view style="line-height: 84rpx; font-weight: bold;">上传名单</view>
+			</view>
+			<view style="width: 95%; margin-left: 2.5%;">
+				<uni-file-picker
+				v-model="Value" 
+				fileMediatype="all"  
+				:fileExtname="['xls', 'xlsx', 'csv']"  
+				limit="1" 
+				@progress="onProgress"
+				@success="onSuccess"
+				@fail="onFail"
+				@select="onSelect"
+				></uni-file-picker>
+			</view>
+			<!-- 文件上传字段要求提示 -->
+			<view class="file-requirements" style="width: 95%; margin-left: 2.5%; margin-top: 14rpx; color: #888888; font-size: 12px;">
+				提示：上传的文件必须包含以下字段：姓名、工号/学号、支部名称、角色、岗位、手机号、部门、年级。
+			</view>
+			<view style="text-align: right;margin-right: 5vh;color: #00aaff;" @click="generateAndOpenFile">
+			  点击下载模板
+			</view>
+			<view style="height: 3vh;"></view>
+		</view>
+		
+		<button class="btn" @click="submit()">批量添加</button>
+	</view>
+</template>
+
+<script>
+	import { getClasses, addChapter, getBranches,getMoBan } from '@/api/api.js'
+	import { getBase_url } from '@/api/index.js'
+
+	export default {
+		data () {
+		    return {
+		        Value: [],			
+		        imageUrl: '',
+		        party: '请选择支部',
+		        partysl: [],
+		    }
+		},
+
+		onLoad() {
+			getBranches().then(res => {
+			    this.partysl = res.map(branch => branch.branch_name); 
+			}).catch(error => {
+			    console.error('获取支部列表失败:', error);
+			});
+
+		},
+		methods: {
+			onBranchChange(event) {
+		        this.party = this.partysl[event.detail.value];
+		    },
+				
+			onProgress(event){
+				console.log('process')
+			},
+			onSuccess(res){
+				console.log('success')
+			},
+			onFail(err){
+				console.log('fail')
+			},
+			onSelect(res){
+				console.log(res.tempFilePaths[0])
+				this.imageUrl = res.tempFilePaths[0] 
+			},
+			generateAndOpenFile() {
+				getMoBan().then((res)=>{
+					console.log(res)
+					uni.downloadFile({
+					  url: res, // 后端返回的文件下载链接
+					  success: (downloadRes) => {
+						if (downloadRes.statusCode === 200) {
+						  // 文件下载成功，提示用户并自动打开文件
+						  uni.showToast({
+							title: '文件下载成功',
+							icon: 'success',
+							duration: 2000
+						  });
+						  uni.openDocument({
+							filePath: downloadRes.tempFilePath,
+							success: () => {
+							  console.log('文件打开成功');
+							}
+						  });
+						}
+						else {
+						  // 文件下载失败提示
+						  uni.showToast({
+							title: '文件下载失败',
+							icon: 'none',
+							duration: 2000
+						  });
+						}
+						
+					  },
+					  fail: (err) => {
+						// 请求失败时的提示
+						uni.showToast({
+						  title: '文件下载失败',
+						  icon: 'none',
+						  duration: 2000
+						});
+						console.error('文件下载失败', err);
+					  }
+					});
+				})
+		    },
+			submit(){
+				if (this.imageUrl === ''){
+					uni.showToast({
+						title: '请上传文件',
+						icon: 'none'
+					})	
+				}
+				else{
+					uni.uploadFile({
+						url: getBase_url() + 'user/uploadAdminFile',
+						filePath: this.imageUrl,
+						name: 'file',
+						formData: {
+							party: this.party,
+						}, 
+						header:{
+							'Authorization': uni.getStorageSync('token') || '',
+							'Content-Type': 'multipart/form-data' // 指定内容类型为 multipart/form-data
+						},		
+						success: (res) => {
+							console.log(res)
+							if (res.data === '添加成功'){
+								uni.showToast({
+									title: res.data,
+									icon: 'none'
+								})	
+								setTimeout(() => {
+									uni.switchTab({
+										url:`/pages/manager/home/home`
+									})
+								}, 1000);	
+							} else {
+								uni.showToast({
+									title: res.data,
+									icon: 'none'
+								})	
+							}						
+						},
+						fail: (err) => {
+							uni.showToast({
+								title: '批量添加失败',
+								icon: 'none'
+							})
+							console.error(err);
+						},
+					});
+				}
+			}
+		}
+	}
+</script>
+
+<style>
+.title{
+	width: 100%;
+	height: 6vh;
+	margin-top: 28rpx;
+	background-color: white;
+}
+.classify{
+	width: 100%;
+	height: 8vh;
+}
+.brief{
+	width: 100%;
+	height: 30vh;
+	margin-top: 28rpx;
+	background-color: white;
+}
+.photo{
+	width: 100%;
+	background-color: white;
+	margin-top: 28rpx;
+}
+.file-requirements {
+	width: 100%;
+	background-color: white;
+	margin-top: 14rpx;
+}
+.btn{
+	width: 100%; 
+	height: 7vh; 
+	margin-top: 98rpx;
+	background-color: #fc4c34; 
+	color: white; 
+	text-align: center; 
+	position: fixed; 
+	bottom: 0;
+}
+</style>

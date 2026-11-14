@@ -1,0 +1,67 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 1000MB
+      max-request-size: 1000MB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL:jdbc:mysql://127.0.0.1:3306/dianguang_party?serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  redis:
+    host: ${REDIS_HOST:127.0.0.1}
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1
+    password:
+    port: ${REDIS_PORT:6379}
+    timeout: 1000
+  web:
+    resources:
+      static-locations: classpath:/static/
+
+avatar:
+  save:
+    path: /images/avatar
+
+file:
+  save:
+    path: src/main/resources/static/images/
+
+upload:
+  file:
+    path: src/main/resources/static/txt/article/
+  dir:
+    avatar: src/main/resources/static/images/avatar/
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启SQL语句打印
+
+server:
+  port: 8080
+  url: http://localhost:8080
+
+alioss:
+  accessKey:
+    id: ${OSS_ACCESS_KEY_ID:local-disabled}
+    secret: ${OSS_ACCESS_KEY_SECRET:local-disabled}
+  bucketName: "spb-dgdy"
+
+logging:
+  config:
+    classpath:logback.xml
+  level:
+    com:
+      example:
+        spb: warn
+    root: info
+
+
+
+
