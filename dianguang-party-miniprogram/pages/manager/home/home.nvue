@@ -1,4 +1,4 @@
-<template><view class="m-page"><view class="m-top"><text class="m-kicker">DIANGUANG WORKSPACE</text><text class="m-title">党建工作台</text><text class="m-subtitle">让组织建设更有温度，让日常工作更高效</text></view><swiper class="m-swiper" autoplay circular indicator-dots indicator-active-color="#a32d3f"><swiper-item v-for="item in swipers" :key="item.id"><image :src="item.url" mode="aspectFit" class="m-swiper-image"/></swiper-item></swiper><view class="m-card"><text class="m-heading">内容运营</text><view class="m-shortcuts"><view v-for="(item,index) in content" :key="index" @click="contentPublish(index)"><text class="m-shortcut-symbol">{{item.title.slice(0,1)}}</text><text>{{item.title}}</text></view></view></view><view class="m-card"><text class="m-heading">组织建设</text><view class="m-shortcuts"><view v-for="(item,index) in party" :key="index" @click="partyManage(index)"><text class="m-shortcut-symbol">{{item.title.slice(0,1)}}</text><text>{{item.title}}</text></view></view></view><view class="m-card"><text class="m-heading">学习教育</text><view class="m-shortcuts"><view v-for="(item,index) in learn" :key="index" @click="learnManage(index)"><text class="m-shortcut-symbol">{{item.title.slice(0,1)}}</text><text>{{item.title}}</text></view></view></view><view class="m-read-entry" @click="openFeed">阅读党建动态 <text>查看专题内容 →</text></view><managerTabbar :managerValue="currentValue"/></view></template>
+<template><view class="m-page"><view class="m-top"><text class="m-title">党建工作台</text></view><swiper class="m-swiper" autoplay circular indicator-dots indicator-active-color="#C91010"><swiper-item v-for="item in swipers" :key="item.id"><image :src="item.url" mode="aspectFit" class="m-swiper-image"/></swiper-item></swiper><view class="m-card"><text class="m-heading">内容运营</text><view class="m-shortcuts"><view v-for="(item,index) in content" :key="index" @click="contentPublish(index)"><view class="m-shortcut-symbol"><party-icon type="compose" size="26" color="#C91010"/></view><text>{{item.title}}</text></view></view></view><view class="m-card"><text class="m-heading">组织建设</text><view class="m-shortcuts"><view v-for="(item,index) in party" :key="index" @click="partyManage(index)"><view class="m-shortcut-symbol"><party-icon type="compose" size="26" color="#C91010"/></view><text>{{item.title}}</text></view></view></view><view class="m-card"><text class="m-heading">学习教育</text><view class="m-shortcuts"><view v-for="(item,index) in learn" :key="index" @click="learnManage(index)"><view class="m-shortcut-symbol"><party-icon type="compose" size="26" color="#C91010"/></view><text>{{item.title}}</text></view></view></view><view class="m-read-entry" @click="openFeed">阅读党建动态 <text>查看专题内容 →</text></view><managerTabbar :managerValue="currentValue"/></view></template>
 <script>
 	import myTable from '@/component/myTable.vue'
 	import managerTabbar from '@/component/managerTabbar.vue'
@@ -15,41 +15,41 @@
 				swipers: [],	
 				// content 超级管理员  content2 支部管理员
 				content:[{
-					url: '/static/manager/home/内容发布.svg',
+					url: '/static/icons/compose-red.png',
 					title: '内容发布'
 				},
 				{
-					url: '/static/manager/home/内容审核.svg',
+					url: '/static/icons/checkbox-red.png',
 					title: '内容审核'
 				},{
-					url: '/static/manager/home/轮播图管理.svg',
+					url: '/static/icons/image-red.png',
 					title: '轮播图管理'
 				}],		
 				party:[{
-					url: '/static/manager/home/支部管理.svg',
+					url: '/static/icons/staff-red.png',
 					title: '支部管理'
 				},
 				{
-					url: '/static/manager/home/党员管理.svg',
+					url: '/static/icons/staff-red.png',
 					title: '党员管理'
 				},{
-					url: '/static/manager/home/积极分子培训.svg',
+					url: '/static/icons/staff-red.png',
 					title: '积极分子培训'
 				}],			
 				learn:[{
-					url: '/static/manager/home/课程发布.svg',
+					url: '/static/icons/list-red.png',
 					title: '课程发布'
 				},
 				{
-					url: '/static/manager/home/学习发布.svg',
+					url: '/static/icons/list-red.png',
 					title: '章节发布'
 				},
 				{
-					url: '/static/manager/home/课程管理.svg',
+					url: '/static/icons/list-red.png',
 					title: '课程管理'
 				},
 				{
-					url: '/static/manager/home/学习管理.svg',
+					url: '/static/icons/list-red.png',
 					title: '学习管理'
 				}],				
 				dotsStyles: {	

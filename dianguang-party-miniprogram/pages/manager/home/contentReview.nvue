@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<view style="height: 8vh; width: 100%; display: flex; flex-direction: row; border-bottom: 1px #abbedb solid; background-color: white;">
+		<view style="height: 112rpx; width: 100%; display: flex; flex-direction: row; border-bottom: 1px #abbedb solid; background-color: white;">
 			<view style="width: 33%;">
 				<view :class="[type === 0 ? 'on_nav' : 'nav']" @click="type = 0">待审核</view>
 			</view>
@@ -74,7 +74,7 @@
 .on_nav{
 	width: 70%;
 	margin-left: 15%;
-	height: 8vh; 
+	height: 112rpx; 
 	line-height: 112rpx;
 	font-size: 28rpx;
 	text-align: center;
@@ -84,7 +84,7 @@
 .nav{
 	width: 70%;
 	margin-left: 15%;
-	height: 8vh; 
+	height: 112rpx; 
 	line-height: 112rpx;
 	font-size: 28rpx;
 	text-align: center;

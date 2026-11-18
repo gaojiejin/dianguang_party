@@ -24,5 +24,12 @@
 	}
 </script>
 <style lang="scss">
-.m-article{display:flex;flex-direction:row;align-items:center;gap:24rpx;background:#fff;border-radius:16rpx;padding:26rpx;margin:18rpx 0}.m-article-copy{flex:1;min-width:0}.m-article-title{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:29rpx;color:#282a2f;line-height:1.7}.m-article-meta{display:flex;flex-direction:row;gap:14rpx;flex-wrap:wrap;font-size:19rpx;color:#9398a1;margin-top:20rpx}.m-article-meta .u-article-type{color:#b1273c}.m-article-cover{width:190rpx;height:138rpx;flex-shrink:0;border-radius:12rpx}
+.m-article{display:flex;flex-direction:row;align-items:center;gap:24rpx;background:#fff;border-radius:16rpx;padding:26rpx;margin:18rpx 0}.m-article-copy{flex:1;min-width:0}.m-article-title{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:29rpx;color:#282a2f;line-height:1.7}.m-article-meta{display:flex;flex-direction:row;gap:14rpx;flex-wrap:wrap;font-size:19rpx;color:#9398a1;margin-top:20rpx}.m-article-meta .u-article-type{color:#C91010}.m-article-cover{width:190rpx;height:138rpx;flex-shrink:0;border-radius:12rpx}
+</style>
+<style>
+.m-article { margin: 24rpx 0; padding: 26rpx; border: 1rpx solid #ededed; border-radius: 14rpx; background: #fff; }
+.m-article-title { overflow-wrap: anywhere; }
+.m-article-meta { font-size: 23rpx; color: #888; }
+.m-article-meta .u-article-type { color: #C91010; }
+.m-article-cover { width: 200rpx; height: 148rpx; border-radius: 8rpx; }
 </style>

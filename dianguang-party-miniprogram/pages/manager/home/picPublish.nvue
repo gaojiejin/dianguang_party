@@ -4,10 +4,10 @@
 
     <!-- 已有轮播图展示区域 -->
     <view v-for="(item, index) in swipers" :key="index" style="margin-bottom: 28rpx;">
-      <view style="width: 100%; padding: 2vh; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); background-color: white;">
+      <view style="width: 100%; padding: 28rpx; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); background-color: white;">
         <view style="display: flex; flex-direction: row; align-items: center;">
           <!-- 左侧图片 -->
-          <image :src="item.url" style="height: 10vh; width: 30%; border-radius: 5px;"></image>
+          <image :src="item.url" style="height: 140rpx; width: 30%; border-radius: 5px;"></image>
 
           <!-- 中间文本信息 -->
           <view style="margin-left: 5%; flex: 1;">

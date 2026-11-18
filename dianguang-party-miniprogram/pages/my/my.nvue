@@ -1,4 +1,13 @@
-<template><view class="m-page"><view class="u-profile"><view class="m-profile-avatar" @click="avatarClick"><image v-if="user.portrait&&!broken" :src="user.portrait" mode="aspectFill" @error="broken=true"/><text v-else>{{user.name?user.name.slice(0,1):'我'}}</text></view><view><text class="m-heading">{{user.name}}</text><text class="m-muted">{{user.role}} · {{user.jobId}}</text><text class="m-muted">{{$store.getters.getBranchName(user.branchId)||'未分配支部'}}</text></view></view><view class="m-card m-profile-links"><view @click="open('information')"><text>个人信息</text><text>›</text></view><view @click="open('myparty')"><text>支部通讯录</text><text>›</text></view><view v-if="user.role==='积极分子'" @click="open('certificate')"><text>学习证明</text><text>›</text></view><view @click="open('changepwd')"><text>修改密码</text><text>›</text></view><view @click="open('setting')"><text>设置</text><text>›</text></view></view><userTabbar :managerValue="2"/></view></template>
+<template>
+ <view class="m-page r-original r-my">
+  <view class="r-profile-header"><view class="r-avatar" @click="avatarClick"><image v-if="user.portrait&&!broken" :src="user.portrait" mode="aspectFill" @error="broken=true"/><party-icon v-else type="person-filled" size="42" color="#fff"/></view><view class="r-profile-copy"><text class="r-profile-name">{{user.name}}</text><text>{{$store.getters.getBranchName(user.branchId)||'未分配支部'}}</text><text>{{user.jobId}} · {{user.role}}</text></view></view>
+  <view class="r-profile-row" @click="open('information')"><view class="r-profile-icon"><party-icon type="person" size="24" color="#C91010"/></view><text>个人信息</text><party-icon type="right" size="17" color="#a1acbb"/></view>
+  <view class="r-profile-row" @click="open('myparty')"><view class="r-profile-icon"><party-icon type="staff" size="24" color="#C91010"/></view><text>支部通讯录</text><party-icon type="right" size="17" color="#a1acbb"/></view>
+  <view v-if="user.role==='积极分子'" class="r-profile-row" @click="open('certificate')"><view class="r-profile-icon"><party-icon type="medal" size="24" color="#C91010"/></view><text>我的学习证明</text><party-icon type="right" size="17" color="#a1acbb"/></view>
+  <view class="r-profile-row" @click="open('changepwd')"><view class="r-profile-icon"><party-icon type="locked" size="24" color="#C91010"/></view><text>修改密码</text><party-icon type="right" size="17" color="#a1acbb"/></view>
+  <view class="r-profile-row" @click="open('setting')"><view class="r-profile-icon"><party-icon type="gear" size="24" color="#C91010"/></view><text>系统设置</text><party-icon type="right" size="17" color="#a1acbb"/></view><userTabbar :managerValue="2"/>
+ </view>
+</template>
 <script>
 import userTabbar from '@/component/userTabbar.vue';
 import request,{getBase_url} from '@/api/index';

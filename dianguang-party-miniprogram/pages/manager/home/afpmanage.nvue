@@ -2,7 +2,7 @@
 	<view>
 		<view class="fixed-header">
 			<!-- 搜索框 -->
-			<view style="height: 6vh; line-height: 84rpx; width: 100%;">
+			<view style="height: 84rpx; line-height: 84rpx; width: 100%;">
 				<uni-search-bar
 					placeholder="搜索"
 					:modelValue="searchQuery"
@@ -17,7 +17,7 @@
 			<view v-for="(item, index) in filteredMembers" :key="item.id" class="member-item" @click="ToMemberDetail(item)">
 				<view class="member-info">
 					<view class="member-avatar">
-						<u-avatar :src="item.portrait" shape="square" size="4vh"></u-avatar>
+						<u-avatar :src="item.portrait" shape="square" size="56rpx"></u-avatar>
 					</view>
 					<view class="member-details">
 						<text class="member-name">{{ item.name }}</text>
@@ -105,7 +105,7 @@
 		width: 100%;
 		background-color: #fff;
 		z-index: 1000;
-		height: 7vh;
+		height: 98rpx;
 		border-bottom: 1px solid #e0e0e0;
 	}
 	
@@ -158,7 +158,7 @@
 	
 	.btn1, .btn2 {
 	  width: 50%;
-	  height: 7.5vh;
+	  height: 105rpx;
 	  background-color: #fc4c34;
 	  color: white;
 	  text-align: center;

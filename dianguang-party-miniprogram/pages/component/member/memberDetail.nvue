@@ -4,7 +4,7 @@
 			<view class="line-text">头像</view>
 			<view class="line-content">
 				<view class="line-avatar">
-					<u-avatar :src="information.portrait" mode="square" size="4vh"></u-avatar>
+					<u-avatar :src="information.portrait" mode="square" size="56rpx"></u-avatar>
 				</view>			
 			</view>
 		</view>
@@ -196,7 +196,7 @@
 		color: white;
 		width: 100%;
 	    background-color: green;
-		height: 5vh;
+		height: 70rpx;
 	    border: none;
 	    font-size: 25.2rpx;
 	    cursor: pointer;
@@ -208,7 +208,7 @@
 		color: white;
 		width: 100%;
 	    background-color: red;
-		height: 5vh;
+		height: 70rpx;
 	    border: none;
 	    font-size: 25.2rpx;
 	    cursor: pointer;
@@ -219,7 +219,7 @@
 	.delete-button {
 	    color: white;
 	    background-color: red;
-		height: 5vh;
+		height: 70rpx;
 	    border: none;
 		width: 100%;
 	    font-size: 25.2rpx;
@@ -235,7 +235,7 @@
 .set-line{
 	display: flex;  
 	flex-direction: row; 
-	height: 6vh; 
+	height: 84rpx; 
 	background-color: white; 
 	margin-top: 14rpx;
 }
@@ -260,14 +260,14 @@
 .line-image{
 	width: 20%;
 	margin-right: 5%;
-	height: 6vh;
+	height: 84rpx;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 }
 .text{
-	height: 6vh;
+	height: 84rpx;
 	line-height: 84rpx;
 }
 </style>

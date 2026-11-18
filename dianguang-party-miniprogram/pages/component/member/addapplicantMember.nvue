@@ -1,72 +1,72 @@
 <template>
 	<view>
-		<view style="width: 90%; margin-left: 5%; font-size: 35rpx; height:8vh; line-height: 112rpx;">积极分子</view>
-		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+		<view style="width: 90%; margin-left: 5%; font-size: 35rpx; height:112rpx; line-height: 112rpx;">积极分子</view>
+		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 			<view style="width: 20%; margin-left: 2.5%; display: flex; flex-direction: row;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="line-height: 84rpx; font-weight: bold;">姓名</view>
 			</view>	
-			<input style="width: 60%; height: 6vh; line-height: 84rpx; margin-left: 10%;" placeholder="请输入" type="text" v-model="name" />	
+			<input style="width: 60%; height: 84rpx; line-height: 84rpx; margin-left: 10%;" placeholder="请输入" type="text" v-model="name" />	
 		</view>	
-		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 			<view style="width: 20%; margin-left: 2.5%; display: flex; flex-direction: row;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="line-height: 84rpx; font-weight: bold;">学号</view>
 			</view>	
-			<input style="width: 60%; height: 6vh; line-height: 84rpx; margin-left: 10%;" placeholder="请输入" type="text" v-model="Id" />	
+			<input style="width: 60%; height: 84rpx; line-height: 84rpx; margin-left: 10%;" placeholder="请输入" type="text" v-model="Id" />	
 		</view>	
 		<view>
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 				<view style="width: 20%; margin-left: 2.5%; display: flex; flex-direction: row;">
 					<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 					<view style="line-height: 84rpx; font-weight: bold;">所属支部</view>
 				</view>		
-				<view style="width: 60%; height: 6vh; line-height: 84rpx; margin-left: 10%;" >
+				<view style="width: 60%; height: 84rpx; line-height: 84rpx; margin-left: 10%;" >
 					<picker style="width: 100%;" @change="partyChange" :value="branch_index" :range="branches" v-model="branch_value">
-						<view style="display: flex; flex-direction: row; width: 100%; height: 6vh;">{{branches[branch_index]}}
-							<image src="/static/manager/home/下.svg" style="margin-left: 1%; margin-top: 21rpx; width: 5%; height: 3vh;"></image>
+						<view style="display: flex; flex-direction: row; width: 100%; height: 84rpx;">{{branches[branch_index]}}
+							<image src="/static/icons/down-gray.png" style="margin-left: 1%; margin-top: 21rpx; width: 5%; height: 42rpx;"></image>
 						</view>
 					</picker>
 				</view>
 			</view>
 		</view>		
-		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 			<view style="width: 20%; margin-left: 2.5%; display: flex; flex-direction: row;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="line-height: 84rpx; font-weight: bold;">角色</view>
 			</view>	
-			<view style="width: 60%; height: 6vh; line-height: 84rpx; margin-left: 10%;">{{roleValue}}</view>
+			<view style="width: 60%; height: 84rpx; line-height: 84rpx; margin-left: 10%;">{{roleValue}}</view>
 		</view>	
-		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 			<view style="width: 20%; margin-left: 2.5%; display: flex; flex-direction: row;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="line-height: 84rpx; font-weight: bold;">岗位</view>
 			</view>	
-			<input style="width: 60%; height: 6vh; line-height: 84rpx; margin-left: 10%;" placeholder="请输入" type="text" v-model="post" />	
+			<input style="width: 60%; height: 84rpx; line-height: 84rpx; margin-left: 10%;" placeholder="请输入" type="text" v-model="post" />	
 		</view>	
-		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 			<view style="width: 20%; margin-left: 2.5%; display: flex; flex-direction: row;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="line-height: 84rpx; font-weight: bold;">手机号</view>
 			</view>	
-			<input style="width: 60%; height: 6vh; line-height: 84rpx; margin-left: 10%;" placeholder="请输入" type="text" v-model="phone" />	
+			<input style="width: 60%; height: 84rpx; line-height: 84rpx; margin-left: 10%;" placeholder="请输入" type="text" v-model="phone" />	
 		</view>	
-		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 			<view style="width: 20%; margin-left: 2.5%; display: flex; flex-direction: row;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="line-height: 84rpx; font-weight: bold;">部门</view>
 			</view>	
-			<input style="width: 60%; height: 6vh; line-height: 84rpx; margin-left: 10%;" placeholder="请输入" type="text" v-model="demartment" />	
+			<input style="width: 60%; height: 84rpx; line-height: 84rpx; margin-left: 10%;" placeholder="请输入" type="text" v-model="demartment" />	
 		</view>	
-		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+		<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 			<view style="width: 20%; margin-left: 2.5%; display: flex; flex-direction: row;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="line-height: 84rpx; font-weight: bold;">年级</view>
 			</view>	
-			<input style="width: 60%; height: 6vh; line-height: 84rpx; margin-left: 10%;" placeholder="请输入" type="text" v-model="grade" />	
+			<input style="width: 60%; height: 84rpx; line-height: 84rpx; margin-left: 10%;" placeholder="请输入" type="text" v-model="grade" />	
 		</view>	
 		<view class="photo">
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh; display: flex; flex-direction: row;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 84rpx; display: flex; flex-direction: row;">
 				<view style="margin-left: 2.5%; line-height: 84rpx; font-weight: bold;">上传头像</view>
 			</view>
 			<view style="margin-left: 5%;">
@@ -80,7 +80,7 @@
 				@select="onSelect"
 				></uni-file-picker>
 			</view>
-			<view style="height: 3vh;"></view>
+			<view style="height: 42rpx;"></view>
 		</view>
 		
 		<button class="btn" @click="addMember()">提交录入</button>
@@ -258,7 +258,7 @@ export default {
 <style>
 .btn{
 	width: 100%; 
-	height: 7vh; 
+	height: 98rpx; 
 	margin-top: 98rpx;
 	background-color: #fc4c34; 
 	color: white; 

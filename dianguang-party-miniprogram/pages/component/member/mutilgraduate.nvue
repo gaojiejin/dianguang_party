@@ -32,7 +32,7 @@
             <checkbox :value="item.id" :checked="item.checked" />
 
             <!-- 头像与信息 -->
-            <u-avatar :src="item.portrait" shape="circle" size="4vh"></u-avatar>
+            <u-avatar :src="item.portrait" shape="circle" size="56rpx"></u-avatar>
             <view class="member-details">
               <text class="member-name">{{ item.name }}</text>
               <text class="member-branch">{{ getBranchName(item.branchId) }}</text>
@@ -189,7 +189,7 @@ export default {
 
   .member-list {
     margin-top: 0px;
-    height: 65vh;
+    height: 910rpx;
   }
 
   .member-item {
@@ -236,7 +236,7 @@ export default {
 	
 	.graduate-btn{
 		width: 100%; 
-		height: 7vh; 
+		height: 98rpx; 
 		margin-top: 98rpx;
 		background-color: #fc4c34; 
 		color: white; 

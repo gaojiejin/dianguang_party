@@ -3,24 +3,24 @@
 		<view class="nav">
 			<view class="party">
 				<picker style="width: 100%;" @change="partyChange" :value="branchIndex" :range="branch" v-model="branchType">
-					<view style="display: flex; flex-direction: row; width: 100%; height: 5vh;">{{branch[branchIndex]}}
-						<image src="/static/manager/home/下.svg" style="margin-left: 1%; margin-top: 14rpx; width: 10%; height: 3vh;"></image>
+					<view style="display: flex; flex-direction: row; width: 100%; height: 70rpx;">{{branch[branchIndex]}}
+						<image src="/static/icons/down-gray.png" style="margin-left: 1%; margin-top: 14rpx; width: 10%; height: 42rpx;"></image>
 					</view>
 				</picker>
 			</view>
 		</view>
 
 		<!-- 如果没有支部，显示提示 -->
-		<view v-if="branchs.length === 0" style="width: 100%; height: 50vh; display: flex; justify-content: center; align-items: center;">
+		<view v-if="branchs.length === 0" style="width: 100%; height: 700rpx; display: flex; justify-content: center; align-items: center;">
 			<text style="font-size: 16px; color: #999;">暂时没有支部</text>
 		</view>
 
 		<!-- 支部列表展示 -->
 		<view v-for="(item, index) in branchs" :key="index" style="margin-bottom: 28rpx;">
-			<view v-if="branchType === '所有党支部' || branchType === item.branch.branchName" style="width: 100%; padding: 2vh; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); background-color: white;">
+			<view v-if="branchType === '所有党支部' || branchType === item.branch.branchName" style="width: 100%; padding: 28rpx; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); background-color: white;">
 				<view style="display: flex; flex-direction: row; align-items: center;">
 					<!-- 左侧图像 -->
-					<image src="/static/manager/home/swiper/2.jpg" style="height: 10vh; width: 30%; border-radius: 5px;"></image>
+					<image src="/static/manager/home/swiper/2.jpg" style="height: 140rpx; width: 30%; border-radius: 5px;"></image>
 					
 					<!-- 中间文本信息 -->
 					<view style="margin-left: 5%; flex: 1;">
@@ -46,7 +46,7 @@
 			</uni-popup>
 		</view>
 		
-		<view style="height: 8vh;"></view>
+		<view style="height: 112rpx;"></view>
 		<button class="newParty" @click="addParty()">新建党支部</button>
 	</view>
 </template>
@@ -124,7 +124,7 @@
 <style>
 .nav{
 	width: 100%;
-	height: 5vh;
+	height: 70rpx;
 	margin-top: 28rpx;
 	display: flex; 
 	flex-direction: row;
@@ -132,7 +132,7 @@
 .party{
 	margin-left: 5%; 
 	width: 40%; 
-	height: 5vh; 
+	height: 70rpx; 
 	line-height: 70rpx; 
 	display: flex;
 	flex-direction: row;
@@ -140,14 +140,14 @@
 .user{
 	margin-left: 10%;
 	width: 40%; 
-	height: 5vh; 
+	height: 70rpx; 
 	line-height: 70rpx; 
 	display: flex;
 	flex-direction: row;
 }
 .btn {
 	width: 100%;
-	height: 4vh;
+	height: 56rpx;
 	background-color: #377f7f;
 	color: white;
 	font-size: 25.2rpx;
@@ -162,7 +162,7 @@
 }
 .newParty{
 	width: 100%;
-	height: 7vh; 
+	height: 98rpx; 
 	margin-top: 98rpx;
 	background-color: #fc4c34; 
 	color: white; 

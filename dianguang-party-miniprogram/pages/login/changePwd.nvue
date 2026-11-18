@@ -1,50 +1,50 @@
 <template>
 	<view>
-		<view style="height: 20vh;">
-			<image src="../../static/login/智慧党建.png" style="height: 15vh; width: 30%; margin-left: 35%; margin-top: 70rpx;"></image>
+		<view style="height: 280rpx;">
+			<image src="/static/icons/logo-red.png" style="height: 210rpx; width: 30%; margin-left: 35%; margin-top: 70rpx;"></image>
 		</view>
-		<view style="height: 10vh; line-height: 140rpx; font-size: 30.8rpx; color: #abbedb; text-align: center;">
+		<view style="height: 140rpx; line-height: 140rpx; font-size: 30.8rpx; color: #abbedb; text-align: center;">
 			忘记密码
 		</view>
 		<view style="width: 78%; margin-left: 11%;">
 			<view class="login-account">
-				<view style="width: 20%; text-align: left; height: 4vh; line-height: 56rpx; font-size: 21rpx; display: flex; flex-direction: row;">
+				<view style="width: 20%; text-align: left; height: 56rpx; line-height: 56rpx; font-size: 21rpx; display: flex; flex-direction: row;">
 					+86
-					<image src="../../static/login/xia.svg" style="height: 4vh; width: 40%; line-height: 56rpx;"></image>
+					<image src="/static/icons/down-gray.png" style="height: 56rpx; width: 40%; line-height: 56rpx;"></image>
 					<view style="color: #abbedb;">|</view>
 				</view>
 				<input placeholder-class="placeholder_class" type="text" placeholder="请输入手机号" v-model="phone"
-				 style="width: 50%; height: 4vh; line-height: 56rpx; font-size: 28rpx;;"/>
+				 style="width: 50%; height: 56rpx; line-height: 56rpx; font-size: 28rpx;;"/>
 				 <view style="width: 35%;">
 					 <button v-if="sixty==0" class="getCode" @click="getCode()">获取验证码</button>
 					 <button v-else class="getCode">获取验证码 {{sixty}}</button>
 				 </view>
 			</view>
 			<view class="login-password">
-				<view style="width: 20%; text-align: left; line-height: 56rpx; height: 4vh; font-size: 21rpx;">验证码</view>
+				<view style="width: 20%; text-align: left; line-height: 56rpx; height: 56rpx; font-size: 21rpx;">验证码</view>
 				<input placeholder-class="placeholder_class" type="text" placeholder="请输入验证码" v-model="code"
-				 style="width: 80%; height: 4vh; line-height: 56rpx; font-size: 28rpx;" />
+				 style="width: 80%; height: 56rpx; line-height: 56rpx; font-size: 28rpx;" />
 			</view>
 			<view class="login-password">
-				<view style="width: 20%; text-align: left; line-height: 56rpx; height: 4vh; font-size: 21rpx;">新密码</view>
+				<view style="width: 20%; text-align: left; line-height: 56rpx; height: 56rpx; font-size: 21rpx;">新密码</view>
 				<input placeholder-class="placeholder_class" :type="Pwd_type1" placeholder="请输入新密码" v-model="password"
-				 style="width: 65%; height: 4vh; line-height: 56rpx; font-size: 28rpx;" />
+				 style="width: 65%; height: 56rpx; line-height: 56rpx; font-size: 28rpx;" />
 				<view v-if="Pwd_type1 === 'password'" style="width: 15%;">
-					<image class="eye" src="../../static/login/no_eye.svg" @click="Pwd_type1 = 'text'"></image>
+					<image class="eye" src="/static/icons/eyeoff-gray.png" @click="Pwd_type1 = 'text'"></image>
 				</view>
 				<view v-else style="width: 15%;">
-					<image class="eye" src="../../static/login/eye.svg" @click="Pwd_type1 = 'password'"></image>
+					<image class="eye" src="/static/icons/eye-gray.png" @click="Pwd_type1 = 'password'"></image>
 				</view>
 			</view>
 			<view class="login-password">
-				<view style="width: 20%; text-align: left; line-height: 56rpx; height: 4vh; font-size: 21rpx;">确认密码</view>
+				<view style="width: 20%; text-align: left; line-height: 56rpx; height: 56rpx; font-size: 21rpx;">确认密码</view>
 				<input placeholder-class="placeholder_class" :type="Pwd_type2" placeholder="请再次输入新密码" v-model="password_again"
-				 style="width: 65%; height: 4vh; line-height: 56rpx; font-size: 28rpx;" />
+				 style="width: 65%; height: 56rpx; line-height: 56rpx; font-size: 28rpx;" />
 				 <view v-if="Pwd_type2 === 'password'" style="width: 15%;">
-				 	<image class="eye" src="../../static/login/no_eye.svg" @click="Pwd_type2 = 'text'"></image>
+				 	<image class="eye" src="/static/icons/eyeoff-gray.png" @click="Pwd_type2 = 'text'"></image>
 				 </view>
 				 <view v-else style="width: 15%;">
-				 	<image class="eye" src="../../static/login/eye.svg" @click="Pwd_type2 = 'password'"></image>
+				 	<image class="eye" src="/static/icons/eye-gray.png" @click="Pwd_type2 = 'password'"></image>
 				 </view>
 			</view>
 			<view>
@@ -94,13 +94,13 @@
 .login-account{
 	display: flex;
 	flex-direction: row; 
-	height: 4vh;
+	height: 56rpx;
 	border-bottom: 1px solid black;
 }
 .login-password{
 	display: flex;
 	flex-direction: row; 
-	height: 4vh;
+	height: 56rpx;
 	margin-top: 28rpx;
 	border-bottom: 1px solid black;
 }
@@ -112,10 +112,10 @@
 }
 .login-button{
 	width: 100%; 
-	height: 5.5vh; 
+	height: 77rpx; 
 	line-height: 77rpx;
 	background-color: #ff4a32;
-	border-radius: 3vh;
+	border-radius: 42rpx;
 	text-align: center;
 	font-size: 21rpx;
 	color: white;	
@@ -123,7 +123,7 @@
 .getCode{
 	background-color: #fbeeee;
 	text-align: center; 
-	height: 3vh;
+	height: 42rpx;
 	line-height: 42rpx;
 	margin-top: 7rpx;
 	font-size: 21rpx;
@@ -132,7 +132,7 @@
 }
 .eye{
 	width: 80%; 
-	height: 2vh; 
+	height: 28rpx; 
 	line-height: 28rpx; 
 	margin-left: 10%; 
 	margin-top: 14rpx;

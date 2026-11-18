@@ -1,17 +1,17 @@
 <template>
 	<view>
 		<view class="title">
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="line-height: 84rpx; font-weight: bold;">标题</view>
-				<input style="width: 100%; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%;" placeholder="请输入标题" type="text" v-model="title" />	
+				<input style="width: 100%; height: 84rpx; text-align: right; line-height: 84rpx; margin-right: 2.5%;" placeholder="请输入标题" type="text" v-model="title" />	
 			</view>		
 		</view>
 		<view class="classify">
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh; display: flex; flex-direction: row;  border-bottom: 1px solid #abbedb;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 84rpx; display: flex; flex-direction: row;  border-bottom: 1px solid #abbedb;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="width: 40%; line-height: 84rpx; font-weight: bold;">学习分类</view>
-				<view style="width: 55%; text-align: right; height: 6vh; line-height: 84rpx; margin-right: 2.5%; display: flex; flex-direction: row;">
+				<view style="width: 55%; text-align: right; height: 84rpx; line-height: 84rpx; margin-right: 2.5%; display: flex; flex-direction: row;">
 					<picker @change="classChange" :value="index" :range="class_list" v-model="class_type" style="width: 100%;">
 						<view style="text-align: right; margin-right: 2.5%;" >{{class_list[class_index]}}</view>
 					</picker>
@@ -19,10 +19,10 @@
 			</view>		
 		</view>
 		<!-- <view class="source">
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh; display: flex; flex-direction: row;  border-bottom: 1px solid #abbedb;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 84rpx; display: flex; flex-direction: row;  border-bottom: 1px solid #abbedb;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="width: 40%; line-height: 84rpx; font-weight: bold;">文章来源</view>
-				<view style="width: 55%; text-align: right; height: 6vh; line-height: 84rpx; margin-right: 2.5%; display: flex; flex-direction: row;">
+				<view style="width: 55%; text-align: right; height: 84rpx; line-height: 84rpx; margin-right: 2.5%; display: flex; flex-direction: row;">
 					<picker @change="sourceChange" :value="source_index" :range="source_list" v-model="source_type" style="width: 100%;">
 						<view style="text-align: right; margin-right: 2.5%;">{{ source_list[source_index] }}</view>
 					</picker>
@@ -32,22 +32,22 @@
 
 		<!-- 新增 URL 输入框 -->
 		 <view v-if="class_type === '链接'" class="url-input">
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="line-height: 84rpx; font-weight: bold;">链接地址</view>
-				<input style="width: 100%; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%;" placeholder="请输入url" type="text" v-model="url" />	
+				<input style="width: 100%; height: 84rpx; text-align: right; line-height: 84rpx; margin-right: 2.5%;" placeholder="请输入url" type="text" v-model="url" />	
 			</view>	
 		</view>
 		<view v-if="class_type === '链接'" class="duration-input">
-		  <view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+		  <view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 		    <view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 		    <view style="line-height: 84rpx; font-weight: bold;">学习时长（秒）</view>
-		    <input style="width: 100%; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%;" placeholder="请输入学习时长" type="number" v-model="duration" />  
+		    <input style="width: 100%; height: 84rpx; text-align: right; line-height: 84rpx; margin-right: 2.5%;" placeholder="请输入学习时长" type="number" v-model="duration" />  
 		  </view>  
 		</view>
 
 		<view v-if="class_type === '视频'" class="photo">
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 84rpx;">
 				<view style="margin-left: 2.5%; line-height: 84rpx; font-weight: bold;">请上传视频</view>
 			</view>
 			<view style="width: 90%;margin-left: 5%;">
@@ -61,15 +61,15 @@
 			      @select="onVideoSelect"
 			    ></uni-file-picker>
 			</view>
-			<view style="height: 3vh;"></view>
+			<view style="height: 42rpx;"></view>
 			<!-- 隐藏的视频播放器，仅用于获取时长 -->
 			<video id="video" :src="videoUrl" @loadedmetadata="getVideoDuration" style="display:none;"></video>
 		</view>
 		<view class="classify">
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh; display: flex; flex-direction: row;  border-bottom: 1px solid #abbedb;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 84rpx; display: flex; flex-direction: row;  border-bottom: 1px solid #abbedb;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="width: 40%; line-height: 84rpx; font-weight: bold;">所属章节</view>
-				<view style="width: 55%; text-align: right; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%; display: flex; flex-direction: row; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+				<view style="width: 55%; text-align: right; height: 84rpx; text-align: right; line-height: 84rpx; margin-right: 2.5%; display: flex; flex-direction: row; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
 					<picker @change="courseChange" :value="index" :range="courses.map(item => item.classTitle)" v-model="course_index" style="width: 100%;">
 						<view  style="text-align: right; margin-right: 2.5%;" >{{courses[course_index].classTitle}}</view>
 					</picker>
@@ -78,7 +78,7 @@
 		</view>
 		
 		<view class="photo">
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh; display: flex; flex-direction: row;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 84rpx; display: flex; flex-direction: row;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="line-height: 84rpx; font-weight: bold;">上传章节头像</view>
 			</view>
@@ -93,7 +93,7 @@
 				@select="onImageSelect"
 				></uni-file-picker>
 			</view>
-			<view style="height: 3vh;"></view>
+			<view style="height: 42rpx;"></view>
 		</view>
 		
 		<picker-color :isShow="showfontColor" :bottom="0"  @callback='getColor' />
@@ -194,7 +194,7 @@
 			</view>
 		</view>	
 
-		<view style="height: 8vh;"></view>
+		<view style="height: 112rpx;"></view>
 		<button class="btn" @click="submit()">发 布</button>
 	</view>
 </template>
@@ -583,17 +583,17 @@ submit(){
 @import "@/component/editor-icon.css";
 .title{
 	width: 100%;
-	height: 6vh;
+	height: 84rpx;
 	margin-top: 28rpx;
 	background-color: white;
 }
 .classify{
 	width: 100%;
-	height: 8vh;
+	height: 112rpx;
 }
 .brief{
 	width: 100%;
-	height: 30vh;
+	height: 420rpx;
 	margin-top: 28rpx;
 	background-color: white;
 }
@@ -602,7 +602,7 @@ submit(){
 }
 .btn{
 	width: 100%; 
-	height: 7vh; 
+	height: 98rpx; 
 	background-color: #fc4c34; 
 	color: white; 
 	text-align: center; 
@@ -653,7 +653,7 @@ submit(){
 	box-sizing: border-box;
 	padding: 12px 15px;
 	width: 100%;
-	min-height: 30vh;
+	min-height: 420rpx;
 	/* height: auto; */
 	/* height: 80%; */
 	margin-top: 20px;

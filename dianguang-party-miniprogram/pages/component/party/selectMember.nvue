@@ -2,13 +2,13 @@
 	<view>
 		<!-- 筛选框 -->
 		<view class="fixed-header">
-			<view style="display: flex; flex-direction: row; height: 6vh; width: 100%; align-items: center;">
+			<view style="display: flex; flex-direction: row; height: 84rpx; width: 100%; align-items: center;">
 				<view style="width: 50%;">
 				    <picker :range="branches" @change="filterByBranch" style="width: 100%;">
 				        <view style="line-height: 84rpx; width: 100%; display: flex; align-items: center; justify-content: center;">
 				            <view style="align-items: center; display: flex; flex-direction: row;">
 				                <view style="white-space: nowrap; display: flex; flex-direction: row;">{{ selectedBranch }}
-									<image src="/static/manager/home/下.svg" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 3vh;"></image>
+									<image src="/static/icons/down-gray.png" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 42rpx;"></image>
 								</view>		                
 				            </view>
 				        </view>
@@ -19,7 +19,7 @@
 						<view style="line-height: 84rpx; width: 100%; display: flex; align-items: center; justify-content: center;">
 						    <view style="align-items: center; display: flex; flex-direction: row;">
 						        <view style="white-space: nowrap; display: flex; flex-direction: row;">{{ selectedRole }}
-									<image src="/static/manager/home/下.svg" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 3vh;"></image>
+									<image src="/static/icons/down-gray.png" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 42rpx;"></image>
 								</view>		                
 						    </view>
 						</view>
@@ -29,7 +29,7 @@
 
 
 			<!-- 搜索框 -->
-			<view style="height: 6vh; line-height: 84rpx; width: 100%; margin-top: 0px;padding-top: 0%;">
+			<view style="height: 84rpx; line-height: 84rpx; width: 100%; margin-top: 0px;padding-top: 0%;">
 				<uni-search-bar
 					placeholder="搜索成员"
 					:modelValue="searchQuery"
@@ -44,7 +44,7 @@
 			<view v-for="(member, index) in filteredMembers" :key="member.id" class="member-item" @click="selectMember(member)">
 				<view class="member-info">
 					<view class="member-avatar">
-						<u-avatar :src="member.portrait" shape="circle" size="4vh"></u-avatar>
+						<u-avatar :src="member.portrait" shape="circle" size="56rpx"></u-avatar>
 					</view>
 					<view class="member-details">
 						<text class="member-name">{{ member.name }}</text>

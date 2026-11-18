@@ -1,14 +1,14 @@
-<template><view><view class="m-bottom-spacer" style="height:150rpx;"></view><view class="m-bottom-nav" style="position:fixed;left:0;right:0;bottom:0;display:flex;flex-direction:row;z-index:9999;background:#fff;padding:16rpx 0;padding-bottom:calc(16rpx + env(safe-area-inset-bottom));border-top:1rpx solid #eee;"><view style="width:33.333%;display:flex;flex-direction:column;align-items:center;font-size:24rpx;" :class="managerValue===0?'m-nav-active':''" @click="ToHome"><view class="u-nav-icon u-icon-home"><view class="u-icon-roof"/></view><text>首页</text></view><view style="width:33.333%;display:flex;flex-direction:column;align-items:center;font-size:24rpx;" :class="managerValue===1?'m-nav-active':''" @click="ToLearn"><view class="u-nav-icon u-icon-book"><view class="u-icon-spine"/></view><text>学习</text></view><view style="width:33.333%;display:flex;flex-direction:column;align-items:center;font-size:24rpx;" :class="managerValue===2?'m-nav-active':''" @click="ToMy"><view class="u-nav-icon u-icon-user"><view class="u-icon-shoulders"/></view><text>我的</text></view></view></view></template>
+<template><view class="r-nav-host"><view class="r-nav-spacer"/><view class="r-bottom-nav"><view v-for="(item,index) in items" :key="index" :class="['r-nav-item',managerValue===index?'r-nav-active':'']" @click="navigate(index)"><party-icon :type="item.icon" size="25" :color="managerValue===index?'#C91010':'#8d99aa'"/><text class="r-nav-label">{{item.text}}</text></view></view></view></template>
 <script>
 	
-	export default {
+	export default {data:()=>({items:[{text:'首页',icon:'home'},{text:'学习',icon:'list'},{text:'我的',icon:'person'}]}),
 		props:{
 			managerValue: {
 				type: Number,
 				required: true
 			}
 		}, 
-		methods: {
+		methods: {navigate(index){[this.ToHome,this.ToLearn,this.ToMy][index]()},
 			ToHome(){
 				if (this.managerValue !== 0){
 					uni.switchTab({
@@ -33,8 +33,4 @@
 		}
 	}
 </script>
-
-
-<style lang="scss">
-@import "../styles/navigation.scss";
-</style>
+<style lang="scss">@import "../styles/responsive-navigation.scss";</style>

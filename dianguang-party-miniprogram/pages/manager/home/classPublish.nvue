@@ -1,26 +1,26 @@
 <template>
 	<view>
 		<view class="title">
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="width: 40%; line-height: 84rpx; font-weight: bold;">课程标题</view>
-				<input style="width: 55%; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%;" placeholder="请输入标题" type="text" v-model="title" />	
+				<input style="width: 55%; height: 84rpx; text-align: right; line-height: 84rpx; margin-right: 2.5%;" placeholder="请输入标题" type="text" v-model="title" />	
 			</view>		
 		</view>
 		
 		<view class="department">
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row; border-bottom: 1px solid #abbedb;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="width: 40%; line-height: 84rpx; font-weight: bold;">所属学院</view>
-				<input style="width: 55%; height: 6vh; text-align: right; line-height: 84rpx; margin-right: 2.5%;" placeholder="请输入部门" type="text" v-model="department" />	
+				<input style="width: 55%; height: 84rpx; text-align: right; line-height: 84rpx; margin-right: 2.5%;" placeholder="请输入部门" type="text" v-model="department" />	
 			</view>		
 		</view>
 		
 		<view class="classify">
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 6vh; display: flex; flex-direction: row;  border-bottom: 1px solid #abbedb;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; height: 84rpx; display: flex; flex-direction: row;  border-bottom: 1px solid #abbedb;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="width: 40%; line-height: 84rpx; font-weight: bold;">课程分类</view>
-				<view style="width: 55%; text-align: right; height: 6vh; line-height: 84rpx; margin-right: 2.5%;">
+				<view style="width: 55%; text-align: right; height: 84rpx; line-height: 84rpx; margin-right: 2.5%;">
 					<picker @change="courseChange" :value="index" :range="courses" v-model="course_index" style="width: 100%;">
 						<view  style="text-align: right; margin-right: 2.5%;" >{{courses[course_index]}}</view>
 					</picker>
@@ -29,7 +29,7 @@
 		</view>
 		
 		<view class="photo">
-			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 6vh; display: flex; flex-direction: row;">
+			<view style="width: 95%; margin-left: 2.5%; margin-right: 2.5%; margin-top: 14rpx; height: 84rpx; display: flex; flex-direction: row;">
 				<view style="margin-left: 2.5%; color: red; line-height: 84rpx;">*</view>
 				<view style="line-height: 84rpx; font-weight: bold;">上传课程头像</view>
 			</view>
@@ -44,9 +44,9 @@
 				@select="onSelect"
 				></uni-file-picker>
 			</view>
-			<view style="height: 3vh;"></view>
+			<view style="height: 42rpx;"></view>
 		</view>
-		<view style="height: 8vh;"></view>
+		<view style="height: 112rpx;"></view>
 		<button class="btn" @click="submit()">创建课程</button>
 	</view>
 </template>
@@ -164,23 +164,23 @@
 <style>
 .title{
 	width: 100%;
-	height: 6vh;
+	height: 84rpx;
 	margin-top: 28rpx;
 	background-color: white;
 }
 .department{
 	width: 100%;
-	height: 6vh;
+	height: 84rpx;
 	background-color: white;
 }
 .classify{
 	width: 100%;
-	height: 6vh;
+	height: 84rpx;
 	background-color: white;
 }
 .brief{
 	width: 100%;
-	height: 30vh;
+	height: 420rpx;
 	margin-top: 28rpx;
 	background-color: white;
 }
@@ -190,7 +190,7 @@
 }
 .btn{
 	width: 100%; 
-	height: 7vh; 
+	height: 98rpx; 
 	margin-top: 98rpx;
 	background-color: #fc4c34; 
 	color: white; 

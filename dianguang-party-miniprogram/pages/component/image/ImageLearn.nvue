@@ -2,10 +2,10 @@
 	<view ref="content" id="content" style="width: 95%; margin-left: 2.5%;">
 		<h1 style="font-weight: bold; font-size: 30.8rpx; line-height: 42rpx; margin-top: 14rpx;">{{ chapter.title }}</h1>
 		<view style="width:100%; margin-top: 14rpx; display: flex; flex-direction: row;">
-			<view style="height: 3vh; line-height: 42rpx; font-size: 25.2rpx;color: #59b4cd">
+			<view style="height: 42rpx; line-height: 42rpx; font-size: 25.2rpx;color: #59b4cd">
 				图文学习
 			</view>
-			<view style="height: 3vh; line-height: 42rpx; margin-left: 3%; font-size: 25.2rpx;color: gray;">
+			<view style="height: 42rpx; line-height: 42rpx; margin-left: 3%; font-size: 25.2rpx;color: gray;">
 				{{  time }}
 			</view>
 		</view>

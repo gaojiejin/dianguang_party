@@ -1,8 +1,8 @@
 <template>
 	<view>
 		<!-- 顶部展示学习统计部分 -->
-		<view style="height: 25vh; width: 100%; background-color: white; display: flex; flex-direction: row;">
-			<view style="height: 20vh; margin-top: 49rpx; width: 30%; margin-left: 5%;">
+		<view style="height: 350rpx; width: 100%; background-color: white; display: flex; flex-direction: row;">
+			<view style="height: 280rpx; margin-top: 49rpx; width: 30%; margin-left: 5%;">
 				<!-- 如果有数据，则显示进度条 -->
 				<l-circularProgress v-if="percent !== null && percent !== undefined" 
 					box-height="150" 
@@ -13,23 +13,23 @@
 					:percent="percent">
 				</l-circularProgress>
 			</view>
-			<view style="height: 20vh; margin-top: 35rpx; width: 50%; margin-left: 5%;">
-				<view style="height: 5vh; width: 100%; line-height: 70rpx; font-size: 35rpx; font-weight: bold; text-align: center;">{{ name }}</view>
+			<view style="height: 280rpx; margin-top: 35rpx; width: 50%; margin-left: 5%;">
+				<view style="height: 70rpx; width: 100%; line-height: 70rpx; font-size: 35rpx; font-weight: bold; text-align: center;">{{ name }}</view>
 				
-				<view style="width: 75%; margin-top: 14rpx; margin-left: 25%; height: 4vh; line-height: 56rpx; display: flex; flex-direction: row;">
-					<image src="/static/manager/home/蓝圆点.png" style="height: 2vh; margin-top: 14rpx;" mode="heightFix"></image>
-					<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">总章节</view>
-					<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">{{ learnRateBranchStatistics.num }} 章节</view>
+				<view style="width: 75%; margin-top: 14rpx; margin-left: 25%; height: 56rpx; line-height: 56rpx; display: flex; flex-direction: row;">
+					<image src="/static/icons/dot-blue.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
+					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">总章节</view>
+					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">{{ learnRateBranchStatistics.num }} 章节</view>
 				</view>
-				<view style="width: 75%; margin-left: 25%; height: 4vh; line-height: 56rpx; display: flex; flex-direction: row;">
-					<image src="/static/manager/home/灰圆点.png" style="height: 2vh; margin-top: 14rpx;" mode="heightFix"></image>
-					<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">未完成</view>
-					<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">{{ learnRateBranchStatistics.num - learnRateBranchStatistics.finishNum }} 章节</view>
+				<view style="width: 75%; margin-left: 25%; height: 56rpx; line-height: 56rpx; display: flex; flex-direction: row;">
+					<image src="/static/icons/dot-gray.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
+					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">未完成</view>
+					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">{{ learnRateBranchStatistics.num - learnRateBranchStatistics.finishNum }} 章节</view>
 				</view>
-				<view style="width: 75%; margin-left: 25%; height: 4vh; line-height: 56rpx; display: flex; flex-direction: row;">
-					<image src="/static/manager/home/灰圆点.png" style="height: 2vh; margin-top: 14rpx;" mode="heightFix"></image>
-					<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">已学习时长:</view>
-					<view style="margin-left: 5%; height: 4vh; line-height: 56rpx;">{{ learnRateBranchStatistics.finishNum }} 小时</view>
+				<view style="width: 75%; margin-left: 25%; height: 56rpx; line-height: 56rpx; display: flex; flex-direction: row;">
+					<image src="/static/icons/dot-gray.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
+					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">已学习时长:</view>
+					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">{{ learnRateBranchStatistics.finishNum }} 小时</view>
 				</view>
 			</view>
 		</view>
@@ -56,7 +56,7 @@
 			<button @click="deleteUser" class="delete-button">删除成员</button> 
 		</view>
 
-		<managerTabbar :managerValue="currentValue" style="height: 3vh; margin-top: 42rpx;"></managerTabbar>
+		<managerTabbar :managerValue="currentValue" style="height: 42rpx; margin-top: 42rpx;"></managerTabbar>
 	</view>
 </template>
 
@@ -224,14 +224,14 @@
 		width: 100%;
 		height: 1px;
 		background-color: #e0e0e0;
-		margin: 1vh 0;
+		margin: 14rpx 0;
 	}
 	.edit-button, .delete-button {
 			color: white;
 			width: 50%;
 		    background-color: green;
 		    border: none;
-		    padding: 0.5vh 1vh;
+		    padding: 7rpx 14rpx;
 		    font-size: 25.2rpx;
 		    cursor: pointer;
 		    border-radius: 4px;

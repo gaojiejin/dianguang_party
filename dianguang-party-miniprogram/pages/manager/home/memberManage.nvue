@@ -2,13 +2,13 @@
 	<view>
 		<!-- 筛选框 -->
 		<view class="fixed-header">
-			<view style="display: flex; flex-direction: row; height: 6vh; width: 100%; align-items: center;">
+			<view style="display: flex; flex-direction: row; height: 84rpx; width: 100%; align-items: center;">
 				<view style="width: 50%;">
 				    <picker :range="branches" @change="filterByBranch" style="width: 100%;">
 				        <view style="line-height: 84rpx; width: 100%; display: flex; align-items: center; justify-content: center;">
 				            <view style="align-items: center; display: flex; flex-direction: row;">
 				                <view style="white-space: nowrap; display: flex; flex-direction: row;">{{ selectedBranch }}
-									<image src="/static/manager/home/下.svg" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 3vh;"></image>
+									<image src="/static/icons/down-gray.png" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 42rpx;"></image>
 								</view>		                
 				            </view>
 				        </view>
@@ -21,7 +21,7 @@
 						<view style="line-height: 84rpx; width: 100%; display: flex; align-items: center; justify-content: center;">
 						    <view style="align-items: center; display: flex; flex-direction: row;">
 						        <view style="white-space: nowrap; display: flex; flex-direction: row;">{{ selectedRole }}
-									<image src="/static/manager/home/下.svg" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 3vh;"></image>
+									<image src="/static/icons/down-gray.png" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 42rpx;"></image>
 								</view>		                
 						    </view>
 						</view>
@@ -30,7 +30,7 @@
 			</view>
 
 			<!-- 搜索框 -->
-			<view style="height: 6vh; line-height: 84rpx; width: 100%;">
+			<view style="height: 84rpx; line-height: 84rpx; width: 100%;">
 				<uni-search-bar
 					placeholder="搜索"
 					:modelValue="searchQuery"
@@ -45,7 +45,7 @@
 			<view v-for="(item, index) in filteredMembers" :key="item.id" class="member-item" @click="ToMemberDetail(item)" v-if="item.role !== '积极分子'">
 				<view class="member-info">
 					<view class="member-avatar">
-						<u-avatar :src="item.portrait" shape="square" size="6vh"></u-avatar>
+						<u-avatar :src="item.portrait" shape="square" size="84rpx"></u-avatar>
 					</view>
 					<view class="member-details">
 						<text class="member-name">{{ item.name }}</text>
@@ -152,7 +152,7 @@
 		width: 100%;
 		background-color: #fff; /* 确保背景色与内容背景色一致 */
 		z-index: 1000; /* 保证固定在最前 */
-		height: 13.5vh;
+		height: 189rpx;
 		border-bottom: 1px solid #e0e0e0; /* 增加底部边框，使其与内容分隔 */
 	}
 	.member-item {
@@ -200,7 +200,7 @@
 	
 	.btn1, .btn2 {
 	  width: 50%;
-	  height: 7vh;
+	  height: 98rpx;
 	  background-color: #fc4c34;
 	  color: white;
 	  text-align: center;

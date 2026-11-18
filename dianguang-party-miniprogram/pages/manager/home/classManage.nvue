@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<view style="height: 6vh; line-height: 84rpx; width: 100%;">
+		<view style="height: 84rpx; line-height: 84rpx; width: 100%;">
 		      <uni-search-bar
 		        placeholder="搜索"
 		        :modelValue="searchQuery"
@@ -12,20 +12,20 @@
 		<view class="tab">
 			<view v-for="(tab, index) in tabList" :key="index" :class="{active: currentTab === index}" @click="changeTab(index)" class="tabitem">
 				{{ tab }}
-				<view v-if="currentTab === index" style="height: 2px; background-color: #FF6A6A; width: 100%; margin-top: 2px;"></view>
+				<view v-if="currentTab === index" style="height: 2px; background-color: #C91010; width: 100%; margin-top: 2px;"></view>
 			</view>
 		</view>
 		<view v-for="(item,index) in courses" :key="index" >
 			<view v-if="searchQuery === '' || item.aclass.classTitle.includes(searchQuery)">
 				<view v-if="item.aclass.authority === currentTab">
-					<view style="height: 12vh; width: 100%; border-radius: 10px;  background-color: white; margin-top: 28rpx;">
-						<view style="width: 100%; height: 10vh; margin-left: 3%; margin-top: 14rpx; display: flex; flex-direction: row;">
+					<view style="height: 168rpx; width: 100%; border-radius: 10px;  background-color: white; margin-top: 28rpx;">
+						<view style="width: 100%; height: 140rpx; margin-left: 3%; margin-top: 14rpx; display: flex; flex-direction: row;">
 							<view style="margin-top: 14rpx;">
-								<u-avatar :src="item.aclass.classPortrait" shape="square" size="8vh"></u-avatar>	
+								<u-avatar :src="item.aclass.classPortrait" shape="square" size="112rpx"></u-avatar>	
 							</view>	
 							<view style="margin-top: 14rpx; margin-left: 5%; width: 45%;">
-								<view style="height: 4vh; line-height: 56rpx; font-size: 35rpx; overflow-x: auto; white-space: nowrap;">{{item.aclass.classTitle}}</view>
-								<view style="height: 4vh; line-height: 56rpx; font-size: 25.2rpx; color: gray;">{{item.aclass.department}}</view>		
+								<view style="height: 56rpx; line-height: 56rpx; font-size: 35rpx; overflow-x: auto; white-space: nowrap;">{{item.aclass.classTitle}}</view>
+								<view style="height: 56rpx; line-height: 56rpx; font-size: 25.2rpx; color: gray;">{{item.aclass.department}}</view>		
 							</view>
 							<!-- 右侧按钮 -->
 							<view style="width: 20%; margin-left: 5%;">
@@ -37,10 +37,10 @@
 					<transition name="expand">
 						<view v-show="expandedList[index]">
 							<view v-for="(item2,index2) in courses[index].chapterList" :key="index2">
-								<view style="width: 90%; margin-left: 5%; border-radius: 10px; height: 15vh; background-color: white; margin-top: 28rpx;">
-									<view style="height: 8vh; margin-top: 14rpx; width: 100%; display: flex; flex-direction: row;">
+								<view style="width: 90%; margin-left: 5%; border-radius: 10px; height: 210rpx; background-color: white; margin-top: 28rpx;">
+									<view style="height: 112rpx; margin-top: 14rpx; width: 100%; display: flex; flex-direction: row;">
 										<view style="margin-top: 14rpx; width: 12%; margin-left: 5%;">
-											<u-avatar :src="item2.chapterPortrait" shape="square" size="6vh"></u-avatar>	
+											<u-avatar :src="item2.chapterPortrait" shape="square" size="84rpx"></u-avatar>	
 										</view>
 										<view style="line-height: 112rpx; width: 48%; margin-left: 5%; font-size: 35rpx; font-weight: bold;  overflow-x: auto; white-space: nowrap;">
 										    {{item2.title}}
@@ -52,24 +52,24 @@
 											
 										</view>
 									</view>
-									<view style="height: 5vh; width: 100%; display: flex; flex-direction: row">
+									<view style="height: 70rpx; width: 100%; display: flex; flex-direction: row">
 										<view style="width: 50%; display: flex; flex-direction: row;">
 											<view style="width: 40%; margin-left: 10%; line-height: 70rpx; color: gray;">{{item2.founder}}</view>
 											<view style="margin-left: 0%; line-height: 70rpx; color: gray;font-size: small;">{{item2.uploadTime ? item2.uploadTime.split('T')[0]:''}}</view>
 										</view>
-										<view v-if="item2.type === 1" style="width: 20%; height: 5vh; display: flex; flex-direction: row;">
-											<image src="/static/user/learn/图文.svg" style="height: 2.5vh; width: 60%; margin-top: 17.5rpx;"></image>
+										<view v-if="item2.type === 1" style="width: 20%; height: 70rpx; display: flex; flex-direction: row;">
+											<image src="/static/icons/image-red.png" style="height: 35rpx; width: 60%; margin-top: 17.5rpx;"></image>
 											<view style="font-size: 25.2rpx; color: gray; line-height: 70rpx;">图文</view>
 										</view>
-										<view v-else-if="item.type === 2" style="width: 20%; height: 5vh; display: flex; flex-direction: row;">
-											<image src="/static/user/learn/视频.svg" style="height: 2.5vh; width: 60%; margin-top: 17.5rpx;"></image>
+										<view v-else-if="item.type === 2" style="width: 20%; height: 70rpx; display: flex; flex-direction: row;">
+											<image src="/static/icons/video-red.png" style="height: 35rpx; width: 60%; margin-top: 17.5rpx;"></image>
 											<view style="font-size: 25.2rpx; color: gray; line-height: 70rpx;">视频</view>
 										</view>
-										<view v-else style="width: 20%; height: 5vh; display: flex; flex-direction: row;">
-											<image src="/static/user/learn/链接.svg" style="height: 2.5vh; width: 60%; margin-top: 17.5rpx;"></image>
+										<view v-else style="width: 20%; height: 70rpx; display: flex; flex-direction: row;">
+											<image src="/static/icons/link-red.png" style="height: 35rpx; width: 60%; margin-top: 17.5rpx;"></image>
 											<view style="font-size: 25.2rpx; color: gray; line-height: 70rpx;">链接</view>
 										</view>
-										<view style="width: 30%; height: 5vh;">
+										<view style="width: 30%; height: 70rpx;">
 											<button class="btn2" @click="delChapter(item2)">删除</button>
 										</view>
 									</view>
@@ -224,7 +224,7 @@ export default {
 }
 .btn {
 	width: 100%;
-	height: 4vh;
+	height: 56rpx;
 	background-color: #377f7f;
 	color: white;
 	font-size: 25.2rpx;
@@ -239,7 +239,7 @@ export default {
 }
 .btn2{
 	width: 60%;
-	height: 4vh;
+	height: 56rpx;
 	margin-top: 7rpx;
 	margin-left: 20%;
 	background-color: #377f7f;
@@ -256,7 +256,7 @@ export default {
 }
 .btn3{
 	width: 100%;
-	height: 4vh;
+	height: 56rpx;
 	background-color: #377f7f;
 	color: white;
 	font-size: 25.2rpx;
@@ -270,7 +270,7 @@ export default {
 	cursor: pointer;
 }
 .active {
-	color: #FF6A6A; /* 选中时文字颜色 */
+	color: #C91010; /* 选中时文字颜色 */
 	font-weight: bold;
 }
 
@@ -292,7 +292,7 @@ export default {
 }
 
 .tabitem.active {
-	color: #FF6A6A;
+	color: #C91010;
 	font-weight: bold;
 }
 </style>

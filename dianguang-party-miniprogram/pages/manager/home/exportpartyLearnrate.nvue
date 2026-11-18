@@ -201,7 +201,7 @@ export default {
   .select-all-btn {
     background-color: #2196f3;
     color: white;
-	height: 5vh;
+	height: 70rpx;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
@@ -215,7 +215,7 @@ export default {
 
   .branch-list {
     margin-top: 10px;
-    height: 65vh;
+    height: 910rpx;
     overflow-y: auto;
   }
 

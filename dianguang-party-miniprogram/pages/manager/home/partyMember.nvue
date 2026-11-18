@@ -1,7 +1,7 @@
 <template>
 	<view style="padding: 5%;">
 		<!-- 搜索框 -->
-		<view style="height: 6vh; line-height: 84rpx; width: 100%; margin-bottom: 28rpx;">
+		<view style="height: 84rpx; line-height: 84rpx; width: 100%; margin-bottom: 28rpx;">
 			<uni-search-bar
 				placeholder="搜索"
 				:modelValue="searchQuery"
@@ -14,7 +14,7 @@
 
 				<view class="member-content" @click="ToMemberDetail(index)">
 					<view class="member-info">
-						<u-avatar :src="item.portrait" shape="circle" size="4vh"></u-avatar>
+						<u-avatar :src="item.portrait" shape="circle" size="56rpx"></u-avatar>
 						<view class="member-details">
 							<text class="member-name">{{ item.name }}</text>
 							<text class="branch-name">{{ branch.branchName }}</text>
@@ -158,7 +158,7 @@
 
 .btn {
 	width: 25%;
-	height: 4vh;
+	height: 56rpx;
 	background-color: #fc4c34;
 	color: white;
 	text-align: center;
