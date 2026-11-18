@@ -1,4 +1,35 @@
-<template><view class="m-article" @click="ToImageText"><view class="m-article-copy"><text class="m-article-title">{{article.title}}</text><view class="m-article-meta"><text class="u-article-type">{{article.type}}</text><text>{{time}}</text></view></view><image v-if="article.imagePath" :src="article.imagePath.split(',')[0]" mode="aspectFill" class="m-article-cover"/></view></template>
+<template>
+	<view v-if="article.imagePath === ''" style="width: 90%; height: 140rpx; margin-left: 5%; border-bottom: 1px solid #abbedb; display: flex; flex-direction: row;"
+		@click="ToImageText">
+		<view style="width: 100%;">
+			<view class="title1">
+				<text>{{article.title}}</text>
+			</view>
+			<view class="type1">
+				<text v-if="article.type === '链接展示'" style="width: 40%;">微课堂展示</text>
+                <text v-else style="width: 40%;">{{article.type}}</text>
+				<text style="margin-left: 14rpx;">{{ time }}</text>
+			</view>	
+		</view>
+	</view>
+	<view v-else style="width: 90%; height: 196rpx; margin-left: 5%; border-bottom: 1px solid #abbedb; display: flex; flex-direction: row;"
+		@click="ToImageText">
+		<view style="width: 60%;">
+			<view class="title2">
+				<text>{{article.title}}</text>
+			</view>
+			<view class="type2">
+                <text v-if="article.type === '链接展示'" style="width: 40%;">微课堂展示</text>
+                <text v-else style="width: 40%;">{{article.type}}</text>
+				<text style="margin-left: 14rpx;">{{ time }}</text>
+			</view>	
+		</view>
+		<view style="width: 40%;">
+			<image :src="article.imagePath.split(',')[0]" mode="scaleToFill" style="margin-top: 14rpx; margin-left: 10%; height: 168rpx; width: 90%;"></image>
+		</view>
+	</view>
+</template>
+
 <script>
 	import { formatDate2 } from '@/utils/formatDate.js'
 	export default {
@@ -14,7 +45,7 @@
 		methods: {
 			ToImageText(){
 				uni.navigateTo({
-					url:`/pages/component/image/ImageText?article_id=${this.article.articleId}`
+					url:`/pages/component/image/ImageText?article=${encodeURIComponent(JSON.stringify(this.article))}`
 				})
 			}
 		},
@@ -23,13 +54,57 @@
 		},
 	}
 </script>
-<style lang="scss">
-.m-article{display:flex;flex-direction:row;align-items:center;gap:24rpx;background:#fff;border-radius:16rpx;padding:26rpx;margin:18rpx 0}.m-article-copy{flex:1;min-width:0}.m-article-title{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:29rpx;color:#282a2f;line-height:1.7}.m-article-meta{display:flex;flex-direction:row;gap:14rpx;flex-wrap:wrap;font-size:19rpx;color:#9398a1;margin-top:20rpx}.m-article-meta .u-article-type{color:#C91010}.m-article-cover{width:190rpx;height:138rpx;flex-shrink:0;border-radius:12rpx}
-</style>
+
 <style>
-.m-article { margin: 24rpx 0; padding: 26rpx; border: 1rpx solid #ededed; border-radius: 14rpx; background: #fff; }
-.m-article-title { overflow-wrap: anywhere; }
-.m-article-meta { font-size: 23rpx; color: #888; }
-.m-article-meta .u-article-type { color: #C91010; }
-.m-article-cover { width: 200rpx; height: 148rpx; border-radius: 8rpx; }
+.title1{
+	height: 84rpx;
+	font-size: 28rpx;
+	line-height: 84rpx;
+	color: #000;
+	overflow: hidden;
+	word-break: break-all; 
+	text-overflow:ellipsis; 
+	display: -webkit-box; 
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 1; 
+}
+.type1{
+	width: 60%;
+	height: 56rpx;
+	line-height: 42rpx;
+	display: flex;
+	flex-direction: row;
+	font-size: 25.2rpx;
+	color: #abbedb;
+	text-align: left;
+	overflow: hidden;
+}
+.title2{
+	height: 112rpx;
+	font-size: 28rpx;
+	line-height: 56rpx;
+	margin-top: 14rpx;
+	justify-content: center;
+	align-items: center;
+	color: #000;
+	text-align: left;
+	overflow: hidden;
+	word-break: break-all; 
+	text-overflow:ellipsis; 
+	display: -webkit-box; 
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2; 
+	
+}
+.type2{
+	height: 56rpx;
+	line-height: 42rpx;
+	margin-top: 14rpx;
+	display: flex;
+	flex-direction: row;
+	font-size: 25.2rpx;
+	color: #abbedb;
+	text-align: left;
+	overflow: hidden;
+}
 </style>

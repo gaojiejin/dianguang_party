@@ -1,4 +1,70 @@
-<template><view class="m-page"><view class="m-top"><text class="m-title">党建工作台</text></view><swiper class="m-swiper" autoplay circular indicator-dots indicator-active-color="#C91010"><swiper-item v-for="item in swipers" :key="item.id"><image :src="item.url" mode="aspectFit" class="m-swiper-image"/></swiper-item></swiper><view class="m-card"><text class="m-heading">内容运营</text><view class="m-shortcuts"><view v-for="(item,index) in content" :key="index" @click="contentPublish(index)"><view class="m-shortcut-symbol"><party-icon type="compose" size="26" color="#C91010"/></view><text>{{item.title}}</text></view></view></view><view class="m-card"><text class="m-heading">组织建设</text><view class="m-shortcuts"><view v-for="(item,index) in party" :key="index" @click="partyManage(index)"><view class="m-shortcut-symbol"><party-icon type="compose" size="26" color="#C91010"/></view><text>{{item.title}}</text></view></view></view><view class="m-card"><text class="m-heading">学习教育</text><view class="m-shortcuts"><view v-for="(item,index) in learn" :key="index" @click="learnManage(index)"><view class="m-shortcut-symbol"><party-icon type="compose" size="26" color="#C91010"/></view><text>{{item.title}}</text></view></view></view><view class="m-read-entry" @click="openFeed">阅读党建动态 <text>查看专题内容 →</text></view><managerTabbar :managerValue="currentValue"/></view></template>
+<template>
+	<view>
+		<uni-swiper-dot class="uni-swiper-dot-box" @clickItem=clickItem :info="swipers" :current="current" :mode="mode"
+			:dots-styles="dotsStyles" field="content">
+			<swiper class="swiper-box" @change="change" :current="swiperDotIndex" :autoplay="autoplay" :interval="interval" :circular="circular">
+				<swiper-item v-for="(item, index) in swipers" :key="index">
+					<view class="swiper-item" :class="'swiper-item' + index">
+						<image :src="item.url" style="width: 100%;"></image>
+					</view>
+				</swiper-item>
+			</swiper>
+		</uni-swiper-dot>
+		<view style="width: 100%; background-color: white;">
+			<view style="font-size: 35rpx; font-weight: bold;margin-left: 3%; margin-top: 5%; color: #e2544a;">内容发布</view>
+		</view>
+		<view>
+			<view class="content">
+				<view v-for="(item,index) in content" :key="index" @click="contentPublish(index)" style="width: 20%;">
+					<view v-if="index === 2" style="height: 112rpx; width: 70%; margin-left: 15%;margin-top: 28rpx; border-radius: 50%; background-color: #e2544a;">
+						<image :src="item.url" style="width: 100%; margin-left:0%; margin-top: 22.4rpx; height: 70rpx;"></image>
+					</view>
+					<view v-else style="height: 112rpx; width: 70%; margin-left: 15%;margin-top: 28rpx; border-radius: 50%; background-color: #e2544a;">
+						<image :src="item.url" style="width: 60%; margin-left: 22%; margin-top: 22.4rpx; height: 70rpx;"></image>
+					</view>
+					<view class="vi-item">{{item.title}}</view>
+				</view>
+			</view>			
+		</view>
+		<view style="width: 100%; background-color: white;">
+			<view style="font-size: 35rpx; font-weight: bold;margin-left: 3%; margin-top: 5%; color: #e2544a;">支部管理</view>
+		</view>
+		<view>
+			<view class="content" >
+				<view v-for="(item,index) in party" :key="index" @click="partyManage(index)" style="width: 20%;">
+					<view v-if="index === 2" style="height: 112rpx; width: 70%; margin-left: 15%;margin-top: 28rpx; border-radius: 50%; background-color: #e2544a;">
+						<image :src="item.url" style="width: 80%; margin-left: 10%; margin-top: 0rpx; height: 84rpx;"></image>
+					</view>
+					<view v-else style="height: 112rpx; width: 70%; margin-left: 15%;margin-top: 28rpx; border-radius: 50%; background-color: #e2544a;">
+						<image :src="item.url" style="width: 80%; margin-left: 10%; margin-top: 14rpx; height: 84rpx;"></image>
+					</view>
+					<view class="vi-item">{{item.title}}</view>
+				</view>
+			</view>
+		</view>
+		<view style="width: 100%; background-color: white;">
+			<view style="font-size: 35rpx; font-weight: bold;margin-left: 3%; margin-top: 5%; color: #e2544a;">学习管理</view>
+		</view>
+		<view>
+			<view class="content">
+				<view v-for="(item,index) in learn" :key="index" @click="learnManage(index)" style="width: 20%;">
+					<view v-if="index === 0" style="height: 112rpx; width: 70%; margin-left: 15%;margin-top: 28rpx; border-radius: 50%; background-color: #e2544a;">
+						<image :src="item.url" style="width: 80%; margin-left: 10%; margin-top: 14rpx; height: 84rpx;"></image>
+					</view>
+					<view v-else style="height: 112rpx; width: 70%; margin-left: 15%;margin-top: 28rpx; border-radius: 50%; background-color: #e2544a;">
+						<image :src="item.url" style="width: 60%; margin-left: 20%; margin-top: 14rpx; height: 84rpx;"></image>
+					</view>
+					<view class="vi-item">{{item.title}}</view>
+				</view>
+			</view>
+		</view>	
+		<view style="width: 100%; background-color: white;">
+			<view style="font-size: 32.2rpx; font-weight: bold; margin-left: 3%; margin-top: 5%;"></view>
+		</view>
+		<managerTabbar :managerValue="currentValue" style="height: 42rpx; margin-top: 42rpx;"></managerTabbar>
+	</view>	
+</template>
+
 <script>
 	import myTable from '@/component/myTable.vue'
 	import managerTabbar from '@/component/managerTabbar.vue'
@@ -15,41 +81,41 @@
 				swipers: [],	
 				// content 超级管理员  content2 支部管理员
 				content:[{
-					url: '/static/icons/compose-red.png',
+					url: '/static/manager/home/内容发布.svg',
 					title: '内容发布'
 				},
 				{
-					url: '/static/icons/checkbox-red.png',
+					url: '/static/manager/home/内容审核.svg',
 					title: '内容审核'
 				},{
-					url: '/static/icons/image-red.png',
+					url: '/static/manager/home/轮播图管理.svg',
 					title: '轮播图管理'
 				}],		
 				party:[{
-					url: '/static/icons/staff-red.png',
+					url: '/static/manager/home/支部管理.svg',
 					title: '支部管理'
 				},
 				{
-					url: '/static/icons/staff-red.png',
+					url: '/static/manager/home/党员管理.svg',
 					title: '党员管理'
 				},{
-					url: '/static/icons/staff-red.png',
+					url: '/static/manager/home/积极分子培训.svg',
 					title: '积极分子培训'
 				}],			
 				learn:[{
-					url: '/static/icons/list-red.png',
+					url: '/static/manager/home/课程发布.svg',
 					title: '课程发布'
 				},
 				{
-					url: '/static/icons/list-red.png',
+					url: '/static/manager/home/学习发布.svg',
 					title: '章节发布'
 				},
 				{
-					url: '/static/icons/list-red.png',
+					url: '/static/manager/home/课程管理.svg',
 					title: '课程管理'
 				},
 				{
-					url: '/static/icons/list-red.png',
+					url: '/static/manager/home/学习管理.svg',
 					title: '学习管理'
 				}],				
 				dotsStyles: {	
@@ -86,7 +152,7 @@
 			this.role = uni.getStorageSync('role');
 			console.log(this.role)	
 		},
-		methods: { openFeed(){uni.switchTab({url:'/pages/user/home/home'})},
+		methods: {
 			// 轮播
 			change(e) {
 				this.current = e.detail.current
@@ -169,3 +235,36 @@
 
 	}
 </script>
+
+<style lang="scss">
+.swiper-box {
+	height: 420rpx;
+	width: 100%;
+}
+
+.swiper-item {
+	/* #ifndef APP-NVUE */
+	display: flex;
+	/* #endif */
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 420rpx;
+	width: 100%;
+	color: #fff;
+}	
+.vi-item {
+	font-size: 28rpx; 
+	line-height: 42rpx; 
+	text-align: center; 
+	margin-top: 14rpx;
+	width:168rpx;
+}
+.content{
+	height: 196rpx; 
+	width: 100%; 
+	display: flex; 
+	flex-direction: row; 
+	background-color: white;
+}
+</style>

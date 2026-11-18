@@ -8,7 +8,7 @@
 				        <view style="line-height: 84rpx; width: 100%; display: flex; align-items: center; justify-content: center;">
 				            <view style="align-items: center; display: flex; flex-direction: row;">
 				                <view style="white-space: nowrap; display: flex; flex-direction: row;">{{ selectedBranch }}
-									<image src="/static/icons/down-gray.png" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 42rpx;"></image>
+									<image src="/static/manager/home/下.svg" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 42rpx;"></image>
 								</view>		                
 				            </view>
 				        </view>
@@ -19,7 +19,7 @@
 						<view style="line-height: 84rpx; width: 100%; display: flex; align-items: center; justify-content: center;">
 						    <view style="align-items: center; display: flex; flex-direction: row;">
 						        <view style="white-space: nowrap; display: flex; flex-direction: row;">{{ selectedRole }}
-									<image src="/static/icons/down-gray.png" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 42rpx;"></image>
+									<image src="/static/manager/home/下.svg" style="margin-left: 2%; margin-top: 21rpx; width: 20px; height: 42rpx;"></image>
 								</view>		                
 						    </view>
 						</view>

@@ -1,1 +1,83 @@
-<template><view class="m-page"><view class="m-top"><text class="m-title">账号设置</text></view><view class="m-card"><text class="m-heading">电光党建</text><text class="m-muted">个人资料与密码可在“我的”页面管理。退出后，本机登录信息将被清除。</text></view><button class="m-primary" @click="ToLogin">退出登录</button></view></template><script>import {clearSession} from "@/utils/session";export default {methods:{ToLogin(){uni.showModal({title:'退出登录',content:'确认退出当前账号？',success:res=>{if(res.confirm){clearSession();this.$store.state.user=[];this.$store.state.token='';uni.reLaunch({url:'/pages/login/login'})}}})}}}</script>
+<template>
+	<view>
+		<view style="height: 350rpx;">
+			<image src="/static/login/智慧党建.png" style="height: 210rpx; width: 30%; margin-left: 35%; margin-top: 140rpx;"></image>
+		</view>
+		<view style="margin-top: 70rpx;"></view>
+		<view class="set-line" hover-class="set-line-hover">
+			<uni-icons type="person" size="56rpx" class="icons"></uni-icons>
+			<view class="line-text">用户协议</view>
+			<view class="line-image">
+				<image style="height: 28rpx;" src="/static/my/right.svg"></image>
+			</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover">
+			<uni-icons type="staff" size="56rpx" class="icons"></uni-icons>
+			<view class="line-text">隐私协议</view>
+			<view class="line-image">
+				<image style="height: 28rpx;" src="/static/my/right.svg"></image>
+			</view>
+		</view>
+		<view class="ToLogin" hover-class="set-line-hover"  @click="ToLogin">
+			退出登录
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		methods : {
+			ToLogin(){
+				// 退出登录  情况本地缓存
+				uni.clearStorageSync();
+				uni.redirectTo({
+					url: '/pages/login/login'
+				})
+				
+			}
+		}
+	}
+</script>
+
+<style>
+	.set-line{
+		display: flex; 
+		flex-direction: row; 
+		height: 84rpx; 
+		background-color: white; 
+		margin-top: 2.8rpx;
+	}
+	.set-line-hover{
+		background-color: aliceblue;
+	}
+	.ToLogin{
+		text-align: center; 
+		line-height: 84rpx; 
+		width: 100%; 
+		margin-top: 11.2rpx; 
+		background-color: white; 
+	}
+	.icons{
+		width: 10%;
+		margin-left: 2.5%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+	.line-text{
+		line-height: 84rpx;
+		width: 70%;
+		margin-left: 2.5%;
+		font-size: 25.2rpx;
+	}
+	.line-image{
+		width: 20%;
+		margin-right: 5%;
+		height: 84rpx;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+</style>

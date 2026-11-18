@@ -1,14 +1,26 @@
-<template><view class="r-nav-host"><view class="r-nav-spacer"/><view class="r-bottom-nav"><view v-for="(item,index) in items" :key="index" :class="['r-nav-item',managerValue===index?'r-nav-active':'']" @click="navigate(index)"><party-icon :type="item.icon" size="25" :color="managerValue===index?'#C91010':'#8d99aa'"/><text class="r-nav-label">{{item.text}}</text></view></view></view></template>
+<template>
+	<u-tabbar
+	:value="managerValue"
+	:fixed="true"
+	:placeholder="false"
+	activeColor="#d81e06"
+	:safeAreaInsetBottom="true">
+		<u-tabbar-item text="首页" icon="home" @click="ToHome()" ></u-tabbar-item>
+		<u-tabbar-item text="学习" icon="grid" @click="ToLearn()" ></u-tabbar-item>
+		<u-tabbar-item text="我的" icon="account" @click="ToMy()" ></u-tabbar-item>
+	</u-tabbar>
+</template>
+
 <script>
 	
-	export default {data:()=>({items:[{text:'首页',icon:'home'},{text:'学习',icon:'list'},{text:'我的',icon:'person'}]}),
+	export default {
 		props:{
 			managerValue: {
 				type: Number,
 				required: true
 			}
 		},
-		methods: {navigate(index){[this.ToHome,this.ToLearn,this.ToMy][index]()},
+		methods: {
 			ToHome(){
 				if (this.managerValue !== 0){
 					if (uni.getStorageSync('role') === '超级管理员'){
@@ -48,4 +60,7 @@
 		}
 	}
 </script>
-<style lang="scss">@import "../styles/responsive-navigation.scss";</style>
+
+<style>
+
+</style>

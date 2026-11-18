@@ -43,7 +43,7 @@
 					<view style="font-size: 28rpx; font-weight: bold;">{{ item.name }}</view>
 					<view style="font-size: 22.4rpx; color: gray; margin-top: 7rpx;">{{ item.department || '未知部门' }}</view>
 				</view>
-				<image src="/static/icons/right-gray.png" style="height: 21rpx; width: 21rpx;"></image>
+				<image src="/static/my/right.svg" style="height: 21rpx; width: 21rpx;"></image>
 			</view>
 		</view>
 

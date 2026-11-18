@@ -1,0 +1,21 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const source=fs.readFileSync('dianguang-party-miniprogram/pages/user/home/home.nvue','utf8').match(/<script>([\s\S]*?)<\/script>/)[1].replace(/^\s*import .*$/gm,'').replace('export default','module.exports=');
+const requests=[];
+const sandbox={module:{exports:{}},homeArticle:{},userTabbar:{},setTimeout,clearTimeout,request:options=>new Promise(resolve=>requests.push({options,resolve})),uni:{pageScrollTo(){}}};
+vm.runInNewContext(source,sandbox);
+const page=sandbox.module.exports,ctx=page.data();
+for(const [name,fn]of Object.entries(page.methods))ctx[name]=fn.bind(ctx);
+(async()=>{
+ ctx.currentPage=3;ctx.keyword='旧搜索';
+ ctx.changeTab(1);
+ assert.equal(ctx.currentPage,1);assert.equal(ctx.keyword,'');
+ assert.equal(requests[0].options.data.type,'支部动态');
+ ctx.keyword='党建';const latest=ctx.fetchArticles();
+ requests[1].resolve({records:[{articleId:2}],total:1,page:1});await latest;
+ requests[0].resolve({records:[{articleId:1}],total:9,page:1});await Promise.resolve();
+ assert.equal(ctx.filteredArticles[0].articleId,2,'stale response must not overwrite search');
+ ctx.changeTab(2);assert.equal(ctx.currentPage,1);assert.equal(ctx.keyword,'');
+ ctx.changeTab(1);assert.equal(ctx.keyword,'党建','each tab retains its keyword');
+ assert.equal(ctx.pageSize,5);
+ console.log('PASS: page reset, independent tab searches, stale response protection, page size');
+})().catch(error=>{console.error(error);process.exitCode=1});

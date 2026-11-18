@@ -1,1 +1,90 @@
-<template><view class="m-page"><view class="u-page-title">个人信息</view><view class="m-card"><view v-for="row in rows" :key="row.label" class="u-info-row"><text>{{row.label}}</text><text>{{row.value||'未填写'}}</text></view></view></view></template><script>export default {computed:{rows(){const u=this.$store.state.user||{};return [{label:'姓名',value:u.name},{label:'学号 / 工号',value:u.jobId},{label:'身份',value:u.role},{label:'所属支部',value:this.$store.getters.getBranchName(u.branchId)},{label:'岗位',value:u.post},{label:'手机号',value:u.phone},{label:'院系',value:u.department},{label:'年级',value:u.grade}]}}}</script>
+<template>
+	<view>
+		<view class="set-line" hover-class="set-line-hover">
+			<view class="line-text">头像</view>
+			<view class="line-content">
+				<view class="line-avatar">
+					<u-avatar :src="user.portrait" mode="square" size="56rpx"></u-avatar>
+				</view>			
+			</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover">
+			<view class="line-text">姓名</view>
+			<view class="line-content">{{user.name}}</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover">
+			<view class="line-text">学/工号</view>
+			<view class="line-content">{{user.jobId}}</view>
+			
+		</view>
+		<view class="set-line" hover-class="set-line-hover">
+			<view class="line-text">所属支部</view>		
+			<view class="line-content">{{this.$store.getters.getBranchName(user.branchId)}}</view>
+			
+		</view>
+		<view class="set-line" hover-class="set-line-hover">
+			<view class="line-text">岗位</view>		
+			<view class="line-content">{{user.post}}</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover">
+			<view class="line-text">手机号</view>		
+			<view class="line-content">{{user.phone}}</view>
+			<!-- <view class="line-image">
+				<image style="height: 28rpx;" src="../../static/my/right.svg"></image>
+			</view> -->
+		</view>
+	</view>
+</template>
+
+<script>
+	import { mapState } from 'vuex';
+	export default {
+		computed: {
+			...mapState([
+			  // 映射 this.user 为 store.state.user
+			  'user'
+			])
+		},
+	}
+</script>
+
+<style>
+.line-avatar{
+	margin-top: 14rpx;
+	margin-left: 90%;
+}
+.set-line{
+	display: flex;  
+	flex-direction: row; 
+	height: 84rpx; 
+	background-color: white; 
+	margin-top: 14rpx;
+}
+.set-line-hover{
+	background-color: aliceblue;
+}
+.line-text{
+	line-height: 84rpx;
+	width: 16%;
+	margin-left: 5%;
+	font-size: 25.2rpx;
+	font-weight: bold;
+	text-align: left;
+}
+.line-content{
+	line-height: 84rpx;
+	width: 74%;
+	margin-right: 5%;
+	text-align: right;
+	font-size: 25.2rpx;
+}
+.line-image{
+	width: 20%;
+	margin-right: 5%;
+	height: 84rpx;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+</style>

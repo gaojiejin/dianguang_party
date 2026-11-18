@@ -1,32 +1,322 @@
 <template>
- <view class="m-page r-original r-my">
-  <view class="r-profile-header"><view class="r-avatar" @click="avatarClick"><image v-if="user.portrait&&!broken" :src="user.portrait" mode="aspectFill" @error="broken=true"/><party-icon v-else type="person-filled" size="42" color="#fff"/></view><view class="r-profile-copy"><text class="r-profile-name">{{user.name}}</text><text>{{$store.getters.getBranchName(user.branchId)||'未分配支部'}}</text><text>{{user.jobId}} · {{user.role}}</text></view></view>
-  <view class="r-profile-row" @click="open('information')"><view class="r-profile-icon"><party-icon type="person" size="24" color="#C91010"/></view><text>个人信息</text><party-icon type="right" size="17" color="#a1acbb"/></view>
-  <view class="r-profile-row" @click="open('myparty')"><view class="r-profile-icon"><party-icon type="staff" size="24" color="#C91010"/></view><text>支部通讯录</text><party-icon type="right" size="17" color="#a1acbb"/></view>
-  <view v-if="user.role==='积极分子'" class="r-profile-row" @click="open('certificate')"><view class="r-profile-icon"><party-icon type="medal" size="24" color="#C91010"/></view><text>我的学习证明</text><party-icon type="right" size="17" color="#a1acbb"/></view>
-  <view class="r-profile-row" @click="open('changepwd')"><view class="r-profile-icon"><party-icon type="locked" size="24" color="#C91010"/></view><text>修改密码</text><party-icon type="right" size="17" color="#a1acbb"/></view>
-  <view class="r-profile-row" @click="open('setting')"><view class="r-profile-icon"><party-icon type="gear" size="24" color="#C91010"/></view><text>系统设置</text><party-icon type="right" size="17" color="#a1acbb"/></view><userTabbar :managerValue="2"/>
- </view>
+	<view style="background-color: #f8f8f8;">
+		<view>
+			<view style="display: flex; flex-direction: row; height: 280rpx; 
+				background: linear-gradient(to bottom, #ff6e32, #ff3731);">
+				<view class="Avator" @click="avatarClick()">
+					<u-avatar :src="user.portrait" size="168rpx"></u-avatar>
+				</view>
+				<view style="width: 70%;">
+					<view style="font-size: 35rpx; color: white; margin-top: 70rpx; margin-left: 5%;">
+						{{ user.name }}
+					</view>
+					<view style="font-size: 28rpx; color: white; margin-top: 14rpx; margin-left: 5%;">
+						{{ this.$store.getters.getBranchName(user.branchId) }}
+					</view>
+					<view style="font-size: 28rpx; color: white; margin-top: 14rpx; margin-left: 5%;">
+						{{ user.jobId }}
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover" @click="ToInformation()">
+			<uni-icons type="person" size="56rpx" class="icons"></uni-icons>
+			<view class="line-text">个人信息</view>
+			<view class="line-image">
+				<image style="height: 28rpx;" src="/static/my/right.svg"></image>
+			</view>
+		</view>		
+		<view class="set-line" hover-class="set-line-hover" @click="ToMyparty()">
+			<uni-icons type="staff" size="56rpx" class="icons"></uni-icons>
+			<view class="line-text">支部通讯录</view>
+			<view class="line-image">
+				<image style="height: 28rpx;" src="/static/my/right.svg"></image>
+			</view>
+		</view>
+		<view v-if="user.role === '积极分子'" class="set-line" hover-class="set-line-hover" @click="exportCertificate()">
+			<uni-icons type="medal" size="56rpx" class="icons"></uni-icons>
+			<view class="line-text">我的学习证明</view>
+			<view class="line-image">
+				<image style="height: 28rpx;" src="/static/my/right.svg"></image>
+			</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover" @click="bindWeChat()">
+			<uni-icons type="weixin" size="56rpx" class="icons"></uni-icons>
+			<view class="line-text">绑定微信</view>
+			<view class="line-image">
+				<image style="height: 28rpx;" src="/static/my/right.svg"></image>
+			</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover" @click="ToChangepwd()">
+			<uni-icons type="locked" size="56rpx" class="icons"></uni-icons>
+			<view class="line-text">修改密码</view>
+			<view class="line-image">
+				<image style="height: 28rpx;" src="/static/my/right.svg"></image>
+			</view>
+		</view>
+		<view class="set-line" hover-class="set-line-hover" @click="ToSetting()">
+			<uni-icons type="gear" size="56rpx" class="icons"></uni-icons>
+			<view class="line-text">系统设置</view>			
+			<view class="line-image">
+				<image style="height: 28rpx;" src="/static/my/right.svg"></image>
+			</view>
+		</view>
+		
+		<!-- 图片区域 -->
+		<view 
+			style="
+				background-image: url('/static/manager/home/swiper/xiaoxian.png');
+				background-size: contain;
+				background-position: right bottom;
+				background-repeat: no-repeat;
+				width: 100%;
+				height: 350rpx;
+				position: fixed;
+				bottom: 112rpx;">
+		</view>
+		
+		<userTabbar :managerValue="currentValue" 
+			style="height: 42rpx; position: fixed; bottom: 0; width: 100%; border: 0;">
+		</userTabbar>
+	</view>
 </template>
+
+
 <script>
-import userTabbar from '@/component/userTabbar.vue';
-import request,{getBase_url} from '@/api/index';
-export default {
- components:{userTabbar},
- data:()=>({broken:false,uploading:false}),
- computed:{user(){return this.$store.state.user||{}}},
- methods:{
-  open(page){if(page==='myparty'&&!this.user.branchId)return uni.showToast({title:'尚未分配支部',icon:'none'});uni.navigateTo({url:'/pages/my/'+page})},
-  avatarClick(){
-   if(this.uploading)return;
-   uni.chooseImage({count:1,sizeType:['compressed'],success:res=>{
-    this.uploading=true;
-    uni.uploadFile({url:getBase_url()+'user/uploadAvatar',name:'avatar',filePath:res.tempFilePaths[0],header:{Authorization:uni.getStorageSync('token')||''},formData:{job_id:uni.getStorageSync('job_id')},
-     success:async upload=>{try{if(upload.statusCode!==200)throw new Error();const user=await request({url:'user/queryByJobID',data:{job_id:uni.getStorageSync('job_id')}});delete user.password;this.$store.state.user=user;uni.setStorageSync('user',user);this.broken=false;uni.showToast({title:'头像已更新'})}catch(e){uni.showToast({title:'头像更新失败，请重试',icon:'none'})}},
-     fail:()=>uni.showToast({title:'上传失败，请重试',icon:'none'}),complete:()=>{this.uploading=false}
-    });
-   }});
-  }
- }
-}
+	import { mapState } from 'vuex';
+	import { queryUserAvatarByJobID } from '@/api/api.js'
+	import { getBase_url } from '@/api/index.js'
+	import userTabbar from '@/component/userTabbar.vue'
+	export default {
+		components: {
+			userTabbar
+		},
+		data() {
+			return {
+				currentValue: 2,
+			}
+		},
+		computed: {
+			...mapState([
+			  // 映射 this.user 为 store.state.user
+			  'user',
+			  'job_id',
+			]),		
+		},
+		methods: {
+			ToInformation() {
+				uni.navigateTo({
+					url:'/pages/my/information'
+				})
+			},
+			ToSetting(){
+				console.log('ToSetting')
+				uni.navigateTo({
+					url:'/pages/my/setting'
+				})
+			},
+			exportCertificate() {			  // 获取存储中的 job_id
+			  const job_id = uni.getStorageSync('job_id');
+			  
+			  if (!job_id) {
+				uni.showToast({
+				  title: '学号未找到',
+				  icon: 'none',
+				  duration: 2000
+				});
+				return;
+			  }
+			
+			  // 发起请求到后端导出培训证明接口，传递 job_id 参数
+			  uni.request({
+				url: getBase_url() + 'classLearnInfo/exportCertificate', // 替换为实际的后端接口地址
+				method: 'POST',
+				header: {
+				  'Content-Type': 'application/x-www-form-urlencoded',
+				  'Authorization': uni.getStorageSync('token') || '' // 如果需要身份验证，传递Token
+				},
+				data: {
+				  job_id: job_id 
+				},
+				success: (res) => {
+				  if (res.statusCode === 200 && res.data != '你尚未完成全部课程学习，不能导出') {
+					// 如果后端返回的是文件下载链接，使用uni.downloadFile下载文件
+					uni.downloadFile({
+					  url: res.data, // 后端返回的文件下载链接
+					  success: (downloadRes) => {
+						if (downloadRes.statusCode === 200) {
+						  // 文件下载成功，提示用户并自动打开文件
+						  uni.showToast({
+							title: '文件下载成功',
+							icon: 'success',
+							duration: 2000
+						  });
+						  uni.openDocument({
+							filePath: downloadRes.tempFilePath,
+							success: () => {
+							  console.log('文件打开成功');
+							}
+						  });
+						}else if(res.data != '你尚未完成全部课程学习，不能导出'){
+							uni.showToast({
+							  title: '你尚未完成全部课程学习，不能导出',
+							  icon: 'none',
+							  duration: 2000
+							});
+						}
+						 else {
+						  // 文件下载失败提示
+						  uni.showToast({
+							title: '文件下载失败',
+							icon: 'none',
+							duration: 2000
+						  });
+						}
+						
+					  },
+					  fail: (err) => {
+						// 请求失败时的提示
+						uni.showToast({
+						  title: '文件下载失败',
+						  icon: 'none',
+						  duration: 2000
+						});
+						console.error('文件下载失败', err);
+					  }
+					});
+				  } else {
+					// 如果后端返回的不是文件下载链接
+					uni.showToast({
+					  title: '导出失败',
+					  icon: 'none',
+					  duration: 2000
+					});
+				  }
+				},
+				fail: (err) => {
+				  // 请求失败时的提示
+				  uni.showToast({
+					title: '请求失败',
+					icon: 'none',
+					duration: 2000
+				  });
+				  console.error('导出培训证明请求失败', err);
+				}
+			  });
+			},			
+			ToMyparty() {
+			    console.log('ToMyparty');
+			    uni.navigateTo({
+			        url: `/pages/my/myparty?branchId=${encodeURIComponent(JSON.stringify(this.user.branchId))}` // 使用模板字符串传递 branchId
+			    });
+			},
+			ToChangepwd() {
+			    console.log('ToChangepwd');
+			    const user = this.user; 
+			    uni.navigateTo({
+			        url: `/pages/my/changepwd?user=${encodeURIComponent(JSON.stringify(this.user))}` 
+			    });
+			},
+			bindWeChat(){
+				uni.showToast({
+				  title: '暂未实现',
+				  icon: 'none',
+				});
+			},
+			// 修改头像
+			avatarClick() {
+				console.log(this.user)
+				var that = this
+				uni.chooseImage({
+					count: 1,
+					success(res){
+						console.log(res)
+						console.log(res.tempFilePaths[0])
+						var avatarUrl = res.tempFilePaths[0]
+						var avatarFile = res.tempFiles[0];
+						uni.uploadFile({
+							url: getBase_url() + 'user/uploadAvatar',
+							filePath: avatarUrl,
+							name: 'avatar',
+							formData: {
+								job_id : uni.getStorageSync('job_id')
+							}, 
+							header:{
+								'Authorization': uni.getStorageSync('token') || '',
+								'Content-Type': 'multipart/form-data' // 指定内容类型为 multipart/form-data
+							},		
+							success: (res) => {
+								var jobId_data = {
+									job_id: uni.getStorageSync('job_id')
+								} 
+								queryUserAvatarByJobID(jobId_data).then((res)=>{
+									console.log('修改头像成功', res);
+									console.log(that.user);
+									that.user.portrait = res
+									uni.showToast({
+										title: '修改头像成功',
+										icon: 'none',
+										duration: 2000
+									})  
+								}).catch((err) =>{
+									console.error('修改头像失败', err);
+								})
+										
+							},
+							fail: (err) => {
+								uni.showToast({
+									title: '修改头像失败',
+									icon: 'none'
+								})
+								console.error(err);
+							},
+						});
+					}
+				})
+			},
+		},		
+	}
 </script>
+
+<style lang="scss">
+.Avator{
+	width: 30%; 
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+.set-line{
+	display: flex; 
+	flex-direction: row; 
+	height: 84rpx; 
+	background-color: white; 
+	margin-top: 21rpx;
+}
+.set-line-hover{
+	background-color: aliceblue;
+}
+.icons{
+	width: 10%;
+	margin-left: 2.5%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+.line-text{
+	line-height: 84rpx;
+	width: 70%;
+	margin-left: 2.5%;
+	font-size: 28rpx;
+}
+.line-image{
+	width: 20%;
+	margin-right: 5%;
+	height: 84rpx;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+</style>

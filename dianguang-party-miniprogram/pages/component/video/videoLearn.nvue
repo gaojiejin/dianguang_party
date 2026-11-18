@@ -1,5 +1,125 @@
-<template><view class="m-page u-reader"><view v-if="error" class="u-state"><text>{{error}}</text><button class="m-small-button" @click="load">重新加载</button></view><template v-if="chapter.chapterId"><view class="u-page-title">{{chapter.title}}</view><video id="myVideo" class="u-video" :src="chapter.chapterVideo" :initial-time="position" controls @play="play" @pause="pause" @ended="ended" @timeupdate="timeupdate" @error="videoError"/><text class="m-muted">{{completed?'已完成':'未完成'}}</text><view v-if="mediaError" class="u-state"><text>视频无法加载，请检查资源或网络</text><button class="m-small-button" @click="retryVideo">重试播放</button></view><rich-text :nodes="html"/><view v-if="pending" class="u-state"><text>学习记录待同步</text><button class="m-small-button" @click="retrySync">重试同步</button></view></template></view></template>
+<template>
+	<view>
+		<view class="page-body">
+			<view class="page-section">
+				<video id="myVideo" :src=chapter.chapterVideo
+				style="width: 100%;"
+				@play="videoPlay"
+				@pause="videoPause"
+				@error="videoErrorCallback" 
+				@ended="videoEnded"
+				:danmu-list="danmuList"
+				show-mute-btn
+				enable-play-gesture
+				controls
+				></video>
+			</view>
+		</view>
+		<view style="width: 100%;">
+			<h1 style="width: 95%; margin-left: 2.5%; font-weight: bold; font-size: 30.8rpx; line-height: 42rpx; margin-top: 14rpx;">{{ chapter.title }}</h1>
+			<view style="width: 100%; margin-top: 14rpx; display: flex; flex-direction: row;">
+				<view style="width: 70%; margin-left: 2.5%; display: flex; flex-direction: row;">
+					<view style="height: 42rpx; line-height: 42rpx; font-size: 25.2rpx;color: #59b4cd">
+						视频学习
+					</view>
+					<view style="height: 42rpx; line-height: 42rpx; margin-left: 3%; font-size: 25.2rpx;color: gray;">
+						{{  time }}
+					</view>
+				</view>
+				
+				<view v-if="!ifLearned" style="width: 20%; left: 7.5%; height: 42rpx; line-height: 42rpx; font-size: 25.2rpx; text-align: center; background-color: #ff4a32;">
+					未完成
+				</view>
+				<view v-else style="width: 20%; left: 7.5%; height: 42rpx; line-height: 42rpx; font-size: 25.2rpx; text-align: center; background-color: #81b337;">
+					已完成
+				</view>
+			</view>
+			
+			<view v-html="chapter.content" style="width: 95%; margin-left: 2.5%; margin-top: 28rpx;"></view>
+		</view>
+	</view>
+</template>
+
 <script>
-import {chapterData,htmlForPhone,reportLearning,touchChapter,flushReports} from '@/utils/learning';import {readLocal,saveLocal} from '@/utils/session';
-export default {data:()=>({chapter:{},user:{},options:{},completed:false,position:0,html:'',error:'',mediaError:false,pending:false,started:0,seconds:0,completionQueued:false}),onLoad(options){this.options=options;this.load()},onHide(){this.capture();this.submit(false)},onUnload(){this.capture();this.submit(false)},methods:{async load(){this.error='';try{const data=await chapterData(this.options);this.chapter=data.chapter;this.user=data.user;this.completed=data.completed;this.html=htmlForPhone(this.chapter.content);this.position=readLocal('video:'+this.chapter.chapterId,0);touchChapter(this.chapter)}catch(e){this.error=e.message||'章节加载失败'}},play(){if(!this.started)this.started=Date.now()},capture(){if(this.started){this.seconds+=(Date.now()-this.started)/1000;this.started=0}},pause(){this.capture();this.submit(false)},timeupdate(e){this.position=e.detail.currentTime;saveLocal('video:'+this.chapter.chapterId,this.position)},videoError(){this.capture();this.mediaError=true;this.submit(false)},retryVideo(){this.mediaError=false;uni.createVideoContext('myVideo',this).play()},ended(){this.capture();this.submit(true)},submit(finished){if(!this.chapter.chapterId||this.completionQueued)return;const seconds=Math.floor(this.seconds);if(!finished&&seconds<=0)return;this.seconds-=seconds;if(finished)this.completionQueued=true;reportLearning({class_id:this.chapter.classId,chapter_id:this.chapter.chapterId,user_id:this.user.id,if_learned:finished||this.completed?1:0,learn_duration:seconds}).then(()=>{if(finished)this.completed=true;this.pending=false}).catch(()=>{this.pending=true})},async retrySync(){try{await flushReports();this.pending=false;const data=await chapterData(this.options);this.completed=data.completed}catch(e){this.pending=true}}}}
+	import { updateLearnRate,addLearnDuration } from '@/api/api.js'
+	import { formatDate } from '@/utils/formatDate.js'
+	export default {
+		data(){
+			return{
+				ifLearned: 0,
+				class_id: '',
+				chapter: '',
+				startTime: 0, // 用于记录视频开始的时间戳
+				learnedTime: 0, // 已学习的时长
+				time: '',
+			}
+		},
+		onLoad(options) {
+			this.class_id = JSON.parse(decodeURIComponent(options.class_id));	
+			this.chapter = JSON.parse(decodeURIComponent(options.chapter));	
+			this.ifLearned = JSON.parse(decodeURIComponent(options.ifLearned)) === true? 1:0;	
+			this.time = formatDate(this.chapter.uploadTime)
+		},
+		onReady: function (res) {
+			this.videoContext = uni.createVideoContext('myVideo')
+		},
+		onHide() {
+			// 页面切换时记录学习时长
+			this.recordLearnedTime();			
+		},
+		onUnload() {
+			// 页面卸载时记录学习时长
+			this.recordLearnedTime();	
+		},
+		methods: {
+			videoErrorCallback: function (e) {
+				console.log('视频错误信息:')
+				console.log(e.target.errMsg)
+			},
+			videoPlay(){
+				console.log('视频播放');
+				this.startTime = Date.now(); // 记录视频开始播放的时间戳
+				
+			},
+			videoPause() {
+				console.log('视频暂停');
+				let currentTime = Date.now();
+				let duration = Math.floor((currentTime - this.startTime) / 1000) ; // 计算播放了多长时间（秒）
+				this.learnedTime += duration; // 累加学习时长
+				this.startTime = 0;
+				console.log(this.learnedTime)
+			},
+			videoEnded() {
+				console.log('视频结束');
+				this.ifLearned = 1;
+				this.recordLearnedTime();
+			},
+			// 记录学习时长并将其发送到后端
+			recordLearnedTime() {
+				if (this.startTime){
+					let currentTime = Date.now();
+					let duration = (currentTime - this.startTime) / 1000 ; // 计算播放了多长时间（秒）
+					this.learnedTime += duration; // 累加学习时长
+					this.startTime = 0; // 重置startTime
+				}			
+				// 发送学习时长到后端
+				var data = {
+					class_id: this.class_id,
+					chapter_id: this.chapter.chapterId,
+					user_id: this.$store.state.user.id,
+					if_learned: this.ifLearned,
+					learn_duration: Math.floor(this.learnedTime) // 发送累计学习时长
+				}
+				addLearnDuration(data).then((res)=>{
+					console.log('学习时长已记录：', this.learnedTime);
+					this.learnedTime = 0
+				});
+			}
+		}
+	}
+
 </script>
+
+<style>
+
+</style>

@@ -12,7 +12,7 @@
 		<view class="tab">
 			<view v-for="(tab, index) in tabList" :key="index" :class="{active: currentTab === index}" @click="changeTab(index)" class="tabitem">
 				{{ tab }}
-				<view v-if="currentTab === index" style="height: 2px; background-color: #C91010; width: 100%; margin-top: 2px;"></view>
+				<view v-if="currentTab === index" style="height: 2px; background-color: #FF6A6A; width: 100%; margin-top: 2px;"></view>
 			</view>
 		</view>
 		<view v-for="(item,index) in courses" :key="index" >
@@ -58,15 +58,15 @@
 											<view style="margin-left: 0%; line-height: 70rpx; color: gray;font-size: small;">{{item2.uploadTime ? item2.uploadTime.split('T')[0]:''}}</view>
 										</view>
 										<view v-if="item2.type === 1" style="width: 20%; height: 70rpx; display: flex; flex-direction: row;">
-											<image src="/static/icons/image-red.png" style="height: 35rpx; width: 60%; margin-top: 17.5rpx;"></image>
+											<image src="/static/user/learn/图文.svg" style="height: 35rpx; width: 60%; margin-top: 17.5rpx;"></image>
 											<view style="font-size: 25.2rpx; color: gray; line-height: 70rpx;">图文</view>
 										</view>
 										<view v-else-if="item.type === 2" style="width: 20%; height: 70rpx; display: flex; flex-direction: row;">
-											<image src="/static/icons/video-red.png" style="height: 35rpx; width: 60%; margin-top: 17.5rpx;"></image>
+											<image src="/static/user/learn/视频.svg" style="height: 35rpx; width: 60%; margin-top: 17.5rpx;"></image>
 											<view style="font-size: 25.2rpx; color: gray; line-height: 70rpx;">视频</view>
 										</view>
 										<view v-else style="width: 20%; height: 70rpx; display: flex; flex-direction: row;">
-											<image src="/static/icons/link-red.png" style="height: 35rpx; width: 60%; margin-top: 17.5rpx;"></image>
+											<image src="/static/user/learn/链接.svg" style="height: 35rpx; width: 60%; margin-top: 17.5rpx;"></image>
 											<view style="font-size: 25.2rpx; color: gray; line-height: 70rpx;">链接</view>
 										</view>
 										<view style="width: 30%; height: 70rpx;">
@@ -270,7 +270,7 @@ export default {
 	cursor: pointer;
 }
 .active {
-	color: #C91010; /* 选中时文字颜色 */
+	color: #FF6A6A; /* 选中时文字颜色 */
 	font-weight: bold;
 }
 
@@ -292,7 +292,7 @@ export default {
 }
 
 .tabitem.active {
-	color: #C91010;
+	color: #FF6A6A;
 	font-weight: bold;
 }
 </style>

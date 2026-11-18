@@ -1,5 +1,108 @@
-<template><view><view v-if="error" class="u-state"><text>{{error}}</text><button class="m-small-button" @click="load">重试</button></view><web-view v-if="url" :src="url" @error="externalError"/><view v-if="pending" class="u-link-sync" @click="mark">记录待同步，点击重试</view></view></template>
+<template>
+	<view ref="content" id="content" style="width: 100%;">
+		<!-- <h1 style="width: 95%; margin-left: 2.5%; font-weight: bold; font-size: 30.8rpx; line-height: 42rpx; margin-top: 14rpx;">{{ chapter.title }}</h1>
+		<view style="width: 100%; margin-top: 14rpx; display: flex; flex-direction: row;">
+			<view style="width: 70%; margin-left: 2.5%; display: flex; flex-direction: row;">
+				<view style="height: 42rpx; line-height: 42rpx; font-size: 25.2rpx;color: #59b4cd">
+					链接学习
+				</view>
+				<view style="height: 42rpx; line-height: 42rpx; margin-left: 3%; font-size: 25.2rpx;color: gray;">
+					{{  time }}
+				</view>
+			</view>
+			
+			<view v-if="!ifLearned" style="width: 20%; left: 7.5%; height: 42rpx; line-height: 42rpx; font-size: 25.2rpx; text-align: center; background-color: #ff4a32;">
+				未完成
+			</view>
+			<view v-else style="width: 20%; left: 7.5%; height: 42rpx; line-height: 42rpx; font-size: 25.2rpx; text-align: center; background-color: #81b337;">
+				已完成
+			</view>
+		</view> -->
+		<view class="container">
+			<web-view :fullscreen="false" :src="webUrl" ></web-view>
+		</view>
+	</view>
+</template>
+
 <script>
-import {chapterData,reportLearning,touchChapter} from '@/utils/learning';
-export default {data:()=>({options:{},chapter:{},user:{},url:'',error:'',completed:false,pending:false,sending:false,remaining:180}),onLoad(options){this.options=options;this.load()},onShow(){if(this.url)this.start()},onHide(){clearInterval(this.timer)},onUnload(){clearInterval(this.timer)},methods:{async load(){this.error='';try{const data=await chapterData(this.options);this.chapter=data.chapter;this.user=data.user;this.completed=data.completed;if(!/^https?:\/\//i.test(this.chapter.content||''))throw new Error('学习链接无效');this.url=this.chapter.content;touchChapter(this.chapter);this.start()}catch(e){this.error=e.message||'链接加载失败'}},externalError(){this.error='链接无法打开，请检查网络和微信业务域名配置';this.url='';clearInterval(this.timer)},start(){clearInterval(this.timer);if(this.completed)return;this.timer=setInterval(()=>{if(this.remaining>0)this.remaining--;else{clearInterval(this.timer);this.mark()}},1000)},async mark(){if(this.completed||this.sending)return;this.sending=true;try{await reportLearning({class_id:this.chapter.classId,chapter_id:this.chapter.chapterId,user_id:this.user.id,if_learned:1,learn_duration:300});this.completed=true;this.pending=false;uni.showToast({title:'学习完成',icon:'success'})}catch(e){this.pending=true}finally{this.sending=false}}}}
+import { addLearnDuration } from '@/api/api.js'
+import { formatDate } from '@/utils/formatDate.js'
+
+export default {
+	data() {
+		return {
+			chapter: '',
+			webUrl: '',
+			ifLearned: false,  // 初始化为未学习完成
+			class_id: '',
+			time: '',
+			countdown: 180,  // 倒计时初始值为 180 秒 (3 分钟)
+			timer: null,     // 用于存储计时器
+		};
+	},
+	onLoad(options) {
+		this.chapter = JSON.parse(decodeURIComponent(options.chapter));	
+		this.webUrl = this.chapter.content;
+		this.class_id = JSON.parse(decodeURIComponent(options.class_id));
+		this.ifLearned = JSON.parse(decodeURIComponent(options.ifLearned));
+		this.time = formatDate(this.chapter.uploadTime);
+		console.log(this.chapter);
+		console.log(this.ifLearned)
+		if (!this.ifLearned){
+			uni.showToast({
+				title: '请学习3分钟后完成',
+				icon: 'none',
+				duration: 2000
+			});
+			
+			// 开始倒计时
+			this.startCountdown();
+		}
+
+		
+	},
+	methods: {
+		startCountdown() {
+			// 每秒更新一次倒计时
+			this.timer = setInterval(() => {
+				if (this.countdown > 0) {
+					this.countdown--;
+				} else {
+					// 倒计时结束，标记学习完成并弹出提示
+					this.markLearned();
+					clearInterval(this.timer);  // 停止计时器
+				}
+			}, 1000);
+		},
+		markLearned() {
+			if (!this.ifLearned) {
+				this.ifLearned = true;
+				
+				var data = {
+					class_id: this.class_id,
+					chapter_id: this.chapter.chapterId,
+					user_id: this.$store.state.user.id,
+					if_learned: 1,
+					learn_duration: 300,  // 假设学习时长 300 秒
+				};
+				
+				// 调用 API 标记学习完成
+				addLearnDuration(data).then((res) => {
+					console.log(res);
+					uni.showToast({
+						title: '图文学习完成',
+						icon: 'success',
+						duration: 2000
+					});
+				});
+			}
+		}
+	},
+	onUnload() {
+		// 页面卸载时，清除计时器，避免内存泄漏
+		if (this.timer) {
+			clearInterval(this.timer);
+		}
+	}
+}
 </script>

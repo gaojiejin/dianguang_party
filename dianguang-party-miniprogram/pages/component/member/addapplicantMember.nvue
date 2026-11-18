@@ -24,7 +24,7 @@
 				<view style="width: 60%; height: 84rpx; line-height: 84rpx; margin-left: 10%;" >
 					<picker style="width: 100%;" @change="partyChange" :value="branch_index" :range="branches" v-model="branch_value">
 						<view style="display: flex; flex-direction: row; width: 100%; height: 84rpx;">{{branches[branch_index]}}
-							<image src="/static/icons/down-gray.png" style="margin-left: 1%; margin-top: 21rpx; width: 5%; height: 42rpx;"></image>
+							<image src="/static/manager/home/下.svg" style="margin-left: 1%; margin-top: 21rpx; width: 5%; height: 42rpx;"></image>
 						</view>
 					</picker>
 				</view>

@@ -1,15 +1,186 @@
 <template>
- <view class="m-page r-original r-learning">
-  <view class="r-study-summary"><view class="r-study-circle"><view class="r-progress-ring"><text class="r-progress-value">{{courses.length?Math.round(finished*100/courses.length):0}}%</text><text class="r-progress-label">课程完成率</text></view></view><view class="r-study-copy"><text class="r-study-name">{{$store.state.user.name || '学习统计'}}</text><view class="r-study-line"><text class="r-dot r-blue"/><text>总课程</text><text>{{courses.length}} 门</text></view><view class="r-study-line"><text class="r-dot r-gray"/><text>未完成</text><text>{{courses.length-finished}} 门</text></view><view class="r-study-line"><text class="r-dot r-green"/><text>已完成</text><text>{{finished}} 门</text></view></view></view>
-  <view class="m-search"><party-icon type="search" size="20" color="#8998ad"/><input v-model="keyword" placeholder="搜索课程名称"/></view>
-  <view class="r-learning-tabs"><view class="r-category r-selected">{{$store.state.user.role==='积极分子'?'积极分子课程':'党员课程'}}</view><button v-if="courses.length" class="r-continue" @click="continueLearning">继续学习 <text>›</text></button></view>
-  <view class="m-tabs"><view v-for="(name,index) in filters" :key="index" :class="['m-tab',status===index?'m-tab-active':'']" @click="status=index">{{name}}</view></view>
-  <view v-if="loading" class="m-empty">加载中…</view><view v-else-if="error" class="u-state"><text>课程加载失败</text><button class="m-small-button" @click="load">重新加载</button></view><view v-else-if="!visibleCourses.length" class="m-empty">{{keyword?'没有找到相关课程':'暂无相关课程'}}</view>
-  <view v-for="course in visibleCourses" :key="course.classId" class="r-course-card" @click="openCourse(course.classId)"><view class="r-course-body"><image v-if="course.classPortrait&&!broken[course.classId]" :src="course.classPortrait" mode="aspectFill" class="r-course-cover" @error="markBroken(course.classId)"/><view v-else class="r-course-cover r-cover-placeholder"><party-icon type="list" size="30" color="#C91010"/></view><view class="m-course-copy"><text class="m-heading">{{course.classTitle}}</text><text class="m-muted">{{course.department}}</text><text class="m-muted">{{course.finished}} / {{course.total}} 节 · {{course.completed?'已完成':'未完成'}}</text></view><party-icon type="right" size="18" color="#9ea9b7"/></view><view class="r-course-meta"><text>南京理工大学</text><text>发布人：{{course.founder}}</text><text>{{course.uploadTime?course.uploadTime.split('T')[0]:''}}</text></view></view>
-  <userTabbar :managerValue="1"/>
- </view>
+	<view>
+		<!-- 顶部展示学习统计部分 -->
+		<view style="height: 350rpx; width: 100%; background-color: white; display: flex; flex-direction: row;">
+		<view style="height: 280rpx; margin-top: 21rpx; width: 30%; margin-left: 5%;">
+			<!-- 如果有数据，则显示进度条 -->
+		
+			<l-circularProgress v-if="percent !== null && percent !== undefined" 
+			box-height="150" 
+			box-width="150"  
+			progressColor="#1684fc" 
+			:lineWidth="15" font-size="15" 
+			gradualColor="#1684fc" 
+			:percent="percent">
+						
+			</l-circularProgress>
+			<!-- 如果没有数据，显示默认的占位符 -->
+			<view v-else style="height: 150px; width: 150px; display: flex; justify-content: center; align-items: center; background-color: #eaeaea; border-radius: 50%;">
+				<text style="font-size: 14px; color: #999;">无数据</text>
+			</view>
+		</view>
+			<view style="height: 280rpx; margin-top: 35rpx; width: 50%; margin-left: 5%;">
+				<view style="height: 70rpx; width: 100%; line-height: 70rpx; font-size: 35rpx; font-weight: bold; text-align: center;">{{ name }}</view>
+				
+				<view style="width: 100%; margin-top: 14rpx; margin-left: 25%; height: 56rpx; line-height: 56rpx; display: flex; flex-direction: row;">
+					<image src="/static/manager/home/蓝圆点.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
+					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">总课程</view>
+					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">{{ learn.shouldLearned }} 课程</view>
+				</view>
+				<view style="width: 100%; margin-left: 25%; height: 56rpx; line-height: 56rpx; display: flex; flex-direction: row;">
+					<image src="/static/manager/home/灰圆点.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
+					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">未完成</view>
+					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">{{ learn.shouldLearned - learn.alreadyLearned }} 课程</view>
+				</view>
+				<view style="width: 100%; margin-left: 25%; height: 56rpx; line-height: 56rpx; display: flex; flex-direction: row;">
+					<image src="/static/manager/home/绿圆点.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
+					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">学习时长:</view>
+					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">{{ learn.annualDuration }}</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 搜索栏 -->
+		<view style="height: 84rpx; line-height: 84rpx; width: 90%; margin-left: 5%; margin-top: 14rpx;">
+			<uni-search-bar placeholder="搜索" :modelValue="searchQuery" cancelButton="none" @input="onSearchInput" />
+		</view>
+		
+		<!-- 自定义 Tab 控制区域 -->
+		<view class="tab">
+			<view v-for="(tab, index) in tabList" :key="index" :class="{active: currentTab === index}" @click="changeTab(index)" class="tabitem">
+				{{ tab }}
+				<view v-if="currentTab === index" style="height: 2px; background-color: #FF6A6A; width: 100%; margin-top: 2px;"></view>
+			</view>
+		</view>
+
+		<!-- 学习内容展示 -->
+		<view v-if="courses.length > 0">
+			<view v-for="(item, index) in courses" :key="index">
+				<view v-if="item.authority === currentTab" style="height: 210rpx; width: 100%; margin-top: 28rpx;" @click="ToLearnDetail(index)">
+					<view style="height: 210rpx; width: 90%; margin-left: 5%; border-radius: 10px; background-color: white;">
+						<view style="width: 100%; height: 140rpx; margin-left: 3%; margin-top: 14rpx; display: flex; flex-direction: row;">
+							<view style="margin-top: 14rpx;">
+								<u-avatar :src="item.classPortrait" shape="square" size="112rpx"></u-avatar>	
+							</view>	
+							<view style="margin-top: 14rpx; margin-left: 5%; width: 65%;">
+								<view style="height: 56rpx; line-height: 56rpx; font-size: 35rpx; overflow-x: auto; white-space: nowrap;">{{ item.classTitle }}</view>
+								<view style="height: 56rpx; line-height: 56rpx; font-size: 25.2rpx; color: gray;">{{ item.department }}</view>		
+							</view>
+							<image src="/static/my/right.svg" style="height: 28rpx; width: 10%; margin-top: 56rpx;"></image>			
+						</view>
+						<view style="display: flex; flex-direction: row;">
+							<view style="height: 42rpx; line-height: 42rpx; font-size: 21rpx; color: gray; margin-left: 3%;">南京理工大学</view>
+							<view style="height: 42rpx; line-height: 42rpx; font-size: 21rpx; color: gray; margin-left: 10%;">发布人： {{ item.founder }}</view>
+							<view style="height: 42rpx; line-height: 42rpx; font-size: 21rpx; color: gray; margin-left: 10%;">{{ item.uploadTime ? item.uploadTime.split('T')[0] : '' }}</view>
+						</view>
+					</view>	
+				</view>
+			</view>
+		</view>
+
+		<view style="margin-top: 42rpx;"></view>
+
+		<userTabbar :managerValue="currentValue" style="height: 42rpx; margin-top: 42rpx;"></userTabbar>
+	</view>
 </template>
+
 <script>
-import request from '@/api/index';import userTabbar from '@/component/userTabbar.vue';import {readLocal} from '@/utils/session';import {flushReports,chapterUrl} from '@/utils/learning';
-export default {components:{userTabbar},data:()=>({screenWidth:uni.getSystemInfoSync().windowWidth,courses:[],keyword:'',status:0,filters:['全部','未完成','已完成'],loading:false,error:false,broken:{}}),computed:{progressSize(){return Math.min(144,Math.floor(this.screenWidth*.32))},finished(){return this.courses.filter(c=>c.completed).length},visibleCourses(){return this.courses.filter(c=>(!this.keyword||(c.classTitle||'').includes(this.keyword))&&(this.status===0||(this.status===1?!c.completed:c.completed)))}},onResize(e){this.screenWidth=e.size.windowWidth},onShow(){this.load()},onPullDownRefresh(){this.load().finally(()=>uni.stopPullDownRefresh())},methods:{markBroken(id){this.$set(this.broken,id,true)},async load(){if(this.loading)return;this.loading=true;this.error=false;try{try{await flushReports()}catch(e){}const user=this.$store.state.user;const data=await Promise.all([request({url:'class/getClasses',method:'POST'}),request({url:'learning/course-progress',data:{user_id:user.id}})]);const map={};(data[1]||[]).forEach(x=>{map[x.classId]=x});const authority=user.role==='积极分子'?1:0;this.courses=(data[0]||[]).filter(c=>Number(c.authority)===authority).map(c=>({...c,...(map[c.classId]||{total:0,finished:0,completed:false})})).sort((a,b)=>b.classId-a.classId)}catch(e){this.error=true}finally{this.loading=false}},openCourse(id){uni.navigateTo({url:'/pages/user/learn/learnDetail?class_id='+id})},async continueLearning(){try{const recent=readLocal('recent',null);const course=this.courses.find(c=>recent&&c.classId===recent.courseId&&!c.completed)||this.courses.find(c=>!c.completed);if(!course)return uni.showToast({title:'当前课程均已完成',icon:'none'});const detail=await request({url:'learnRate/getUserLearnDetail',method:'POST',data:{class_id:course.classId,user_id:this.$store.state.user.id}});let index=(detail.chapterList||[]).findIndex((c,i)=>recent&&c.chapterId===recent.chapterId&&!detail.chapterIfLearnedList[i]);if(index<0)index=(detail.chapterList||[]).findIndex((c,i)=>!detail.chapterIfLearnedList[i]);if(index<0)return this.openCourse(course.classId);uni.navigateTo({url:chapterUrl(course.classId,detail.chapterList[index])})}catch(e){}}}}
+	import userTabbar from '@/component/userTabbar.vue'
+	import { getClasses, getOwnLearnInfo } from '@/api/api.js'
+
+	export default {
+		components: {
+			userTabbar
+		},
+		data() {
+			return {
+				currentValue: 1,
+				searchQuery: '',
+				currentTab: 0,  // 当前选中的标签页
+				courses: [],
+				tabList: ['党员学习', '积极分子学习'],  // 标签名称
+				// 新增的变量
+				name: '个人学习统计',  
+				percent: 75,  
+				learnRateBranchStatistics: {
+					num: 30,
+					finishNum: 20,
+
+				},
+				learn: '',
+			}
+		},
+		onLoad() {
+			
+		},
+		onShow() {
+			var data = {
+				user_id : this.$store.state.user.id
+			}
+			getOwnLearnInfo(data).then((res)=>{
+				console.log(res)
+				this.learn = res
+				this.percent = Math.round(this.learn.alreadyLearned * 1000 / this.learn.shouldLearned) / 10;
+			})
+			getClasses().then((res) => {
+				this.courses = res;
+			});
+		},
+		methods: {
+			onSearchInput(value) {
+				this.searchQuery = value;
+			},
+			changeTab(index) {
+				this.currentTab = index;
+			},
+			ToLearnDetail(index) {
+				if (this.currentTab === 0 && this.$store.state.user.role === '积极分子'){
+					uni.showToast({
+						title: '无权限学习',
+						icon: 'error'
+					})	
+				}
+				else if (this.currentTab === 1 && this.$store.state.user.role !== '积极分子'){
+					uni.showToast({
+						title: '无权限学习',
+						icon: 'error'
+					})	
+				}
+				else{
+					uni.navigateTo({
+						url: `/pages/user/learn/learnDetail?course=${encodeURIComponent(JSON.stringify(this.courses[index]))}`
+					});
+				}		
+			}
+		}
+	}
 </script>
+
+<style scoped>
+	.active {
+		color: #FF6A6A; /* 选中时文字颜色 */
+		font-weight: bold;
+	}
+
+	.tab {
+		width: 100%;
+		margin-top: 14rpx;
+		display: flex;
+		flex-direction: row;
+		border-bottom: 1px solid #eaeaea;
+	}
+
+	.tabitem {
+		flex: 1; /* 确保每个标签均匀分布 */
+		text-align: center;
+		font-size: 14px;
+		padding-bottom: 10px;
+		color: #333;
+		position: relative; /* 保证子元素可以相对定位 */
+	}
+
+	.tabitem.active {
+		color: #FF6A6A;
+		font-weight: bold;
+	}
+</style>

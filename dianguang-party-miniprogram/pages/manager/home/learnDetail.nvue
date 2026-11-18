@@ -12,14 +12,14 @@
     			{{learnRateBranchStatistics.learn_class.classTitle}}
     		</view>
     		<view style="width: 75%; margin-top: 14rpx; margin-left: 25%; height: 56rpx; line-height: 56rpx; display: flex; flex-direction: row;" >
-    			<image src="/static/icons/dot-green.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
+    			<image src="/static/manager/home/绿圆点.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
     			<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">总人数</view>
     			<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">
     				{{learnRateBranchStatistics.num}} 人
     			</view>	
     		</view>
     		<view style="width: 75%; margin-left: 25%; height: 56rpx; line-height: 56rpx; display: flex; flex-direction: row;">
-    			<image src="/static/icons/dot-red.png"  style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
+    			<image src="/static/manager/home/红圆点.png"  style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
     			<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">未完成</view>
     			<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">
     				{{learnRateBranchStatistics.num - learnRateBranchStatistics.finishNum}} 人
@@ -37,8 +37,8 @@
 				<view style="width: 80%; margin-left: 5%; line-height: 84rpx; font-size: 25.2rpx;">
 					{{item.user.name}}
 				</view>
-				<image v-if="!item.ifLearned" src="/static/icons/dot-red.png" style="height: 28rpx; margin-top: 28rpx;" mode="heightFix"></image>
-				<image v-else src="/static/icons/dot-green.png" style="height: 28rpx; margin-top: 28rpx;" mode="heightFix"></image>
+				<image v-if="!item.ifLearned" src="/static/manager/home/红圆点.png" style="height: 28rpx; margin-top: 28rpx;" mode="heightFix"></image>
+				<image v-else src="/static/manager/home/绿圆点.png" style="height: 28rpx; margin-top: 28rpx;" mode="heightFix"></image>
 			</view>
 		</view>
 	</view>

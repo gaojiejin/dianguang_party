@@ -17,17 +17,17 @@
 				<view style="height: 70rpx; width: 100%; line-height: 70rpx; font-size: 35rpx; font-weight: bold; text-align: center;">{{ name }}</view>
 				
 				<view style="width: 75%; margin-top: 14rpx; margin-left: 25%; height: 56rpx; line-height: 56rpx; display: flex; flex-direction: row;">
-					<image src="/static/icons/dot-blue.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
+					<image src="/static/manager/home/蓝圆点.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
 					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">总章节</view>
 					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">{{ learnRateBranchStatistics.num }} 章节</view>
 				</view>
 				<view style="width: 75%; margin-left: 25%; height: 56rpx; line-height: 56rpx; display: flex; flex-direction: row;">
-					<image src="/static/icons/dot-gray.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
+					<image src="/static/manager/home/灰圆点.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
 					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">未完成</view>
 					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">{{ learnRateBranchStatistics.num - learnRateBranchStatistics.finishNum }} 章节</view>
 				</view>
 				<view style="width: 75%; margin-left: 25%; height: 56rpx; line-height: 56rpx; display: flex; flex-direction: row;">
-					<image src="/static/icons/dot-gray.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
+					<image src="/static/manager/home/灰圆点.png" style="height: 28rpx; margin-top: 14rpx;" mode="heightFix"></image>
 					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">已学习时长:</view>
 					<view style="margin-left: 5%; height: 56rpx; line-height: 56rpx;">{{ learnRateBranchStatistics.finishNum }} 小时</view>
 				</view>

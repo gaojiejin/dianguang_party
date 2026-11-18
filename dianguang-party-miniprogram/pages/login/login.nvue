@@ -1,10 +1,322 @@
 <template>
- <view class="r-original r-login"><view class="r-login-brand"><image class="r-brand-logo" src="/static/icons/logo-red.png" mode="aspectFit"/><text class="r-brand-title">电光党建</text></view>
- <view class="r-login-tabs"><text class="r-login-selected">密码登录</text><text @click="showSms">验证码登录</text></view>
- <view class="r-login-form"><view class="r-login-field"><party-icon type="person" size="24" color="#94a7c0"/><input v-model.trim="account" placeholder="请输入账号" maxlength="40" confirm-type="next"/></view><view class="r-login-field"><party-icon type="locked" size="24" color="#94a7c0"/><input v-model="password" password placeholder="请输入密码" @confirm="Login" confirm-type="done"/></view><view class="r-login-help"><text @click="forgot">忘记密码</text></view><button class="r-login-button" :loading="busy" :disabled="busy" @click="Login">登录</button><text v-if="error" class="u-error">{{error}}</text></view>
- </view>
+	<view>
+		<view style="height: 420rpx;">
+			<image src="/static/login/智慧党建.png" style="height: 210rpx; width: 30%; margin-left: 35%; margin-top: 210rpx;"></image>
+		</view>
+		<view style="height: 56rpx; margin-top: 84rpx; width: 80%; margin-left: 10%; display: flex; flex-direction: row;">
+			<view :class="{'on_login': type, 'login': !type }" @click="type = true">密码登录</view>
+			<view :class="{ 'login': type, 'on_login': !type}" @click="type = false">验证码登录</view>
+		</view>
+		<view style="width: 78%; margin-left: 11%; margin-top: 70rpx;">
+			<view v-if="type">
+				<view class="login-account">
+					<uni-icons type="person" size="42rpx" style="width: 15%; text-align: center; line-height: 56rpx;"></uni-icons>
+					<input placeholder-class="placeholder_class" type="text" placeholder="请输入账号" v-model="account"
+					 style="width: 80%; height: 56rpx; line-height: 56rpx; font-size: 28rpx;"/>
+				</view>
+				<view class="login-password">
+					<uni-icons type="locked" size="42rpx" style="width: 15%; text-align: center; line-height: 56rpx;"></uni-icons>
+					<input placeholder-class="placeholder_class" type="password" placeholder="请输入密码" v-model="password"
+					 style="width: 80%; height: 56rpx; line-height: 56rpx; font-size: 28rpx;" />
+				</view>
+				<!-- <view class="forget" hover-class="forget_hover" @click="Forget_Password()">
+					忘记密码
+				</view> -->
+				<view class="forget" hover-class="forget_hover">
+
+				</view>
+				<view>
+					<button class="login-button" style="margin-top: 14rpx;" @click="Login">登录</button>
+				</view>
+			</view>
+			<view v-else>
+				<view class="login-account">
+					<view style="width: 20%; text-align: left; height: 56rpx; line-height: 56rpx; font-size: 21rpx; display: flex; flex-direction: row;">
+						+86
+						<image src="/static/login/xia.svg" style="height: 56rpx; width: 40%; line-height: 56rpx;"></image>
+						<view style="color: #abbedb;">|</view>
+					</view>
+					<input placeholder-class="placeholder_class" type="text" placeholder="请输入手机号" v-model="phone"
+					 style="width: 50%; height: 56rpx; line-height: 56rpx; font-size: 28rpx;;"/>
+					 <view style="width: 35%;">
+						 <button v-if="sixty==0" class="getCode" @click="getCode()">获取验证码</button>
+						 <button v-else class="getCode">获取验证码 {{sixty}}</button>
+					 </view>
+				</view>
+				<view class="login-password">
+					<view style="width: 20%; text-align: left; line-height: 56rpx; height: 56rpx; font-size: 21rpx;">验证码</view>
+					<input placeholder-class="placeholder_class" type="text" placeholder="请输入验证码" v-model="code"
+					 style="width: 80%; height: 56rpx; line-height: 56rpx; font-size: 28rpx;" />
+				</view>
+				<view>
+				<button class="login-button" style="margin-top: 70rpx;" @click="phoneLogin()">登录</button>
+				</view>
+			</view>
+		</view>
+		<view style="margin-top: 280rpx;">
+			<view style="color: #abbedb; font-size: 21rpx; text-align: center;">其他登录方式</view>
+			<image src="/static/login/weixin.svg" style="height: 42rpx; width: 10%; margin-left: 45%; margin-top: 28rpx; text-align: center;"></image>
+		</view>
+	</view>
 </template>
+
 <script>
-import request from '@/api/index';import {flushReports} from '@/utils/learning';
-export default {data:()=>({account:'',password:'',busy:false,error:''}),methods:{async Login(){if(this.busy)return;if(!this.account||!this.password)return uni.showToast({title:'请输入账号和密码',icon:'none'});this.busy=true;this.error='';try{const login=await request({url:'login/jobIDLogin',method:'POST',data:{job_id:this.account,password:this.password},silent:true});if(!login||!login.token)throw new Error(typeof login==='string'?login:'登录失败');uni.setStorageSync('token',login.token);uni.setStorageSync('job_id',this.account);const user=await request({url:'user/queryByJobID',data:{job_id:this.account}});if(!user||!user.id)throw new Error('用户信息获取失败');const safe={...user};delete safe.password;uni.setStorageSync('user',safe);uni.setStorageSync('role',user.role);uni.setStorageSync('phone',user.phone||'');Object.assign(this.$store.state,{user:safe,token:login.token,job_id:this.account,role:user.role,phone:user.phone});try{this.$store.state.branchIdToName=await request({url:'branch/queryIDNameMapping'})}catch(e){}flushReports().catch(()=>{});uni.switchTab({url:user.role==='超级管理员'?'/pages/manager/home/home':'/pages/user/home/home'})}catch(e){this.error=e.message||'登录失败，请重试'}finally{this.busy=false}},showSms(){uni.showModal({title:'验证码登录',content:'本地环境未接入短信服务，请使用账号密码登录。',showCancel:false})},forgot(){uni.showModal({title:'找回密码',content:'本地环境未接入短信服务，请联系管理员重置密码。',showCancel:false})}}}
+	import { jobid_login, queryUserByJobID, queryUserAvatarByJobID, getSmsCode, smsLogin, queryByPhone } from '@/api/api.js'
+	export default {
+		data () {
+			return {
+				type: true,
+				// 账号密码登录
+				account: '',
+				password: '',
+				// 手机号登录
+				phone: '',
+				code:'',	
+				smsCode: '',
+				sixty: 0,
+			}
+		},	
+		methods: {
+			Login(){	
+				if (this.account === '' || this.account === null){
+					uni.showToast({
+						title: '请输入账号',
+						icon: 'error',
+						duration: 1000
+					})
+				}
+				else if (this.password === '' || this.password === null) {
+					uni.showToast({
+						title: '请输入密码',
+						icon: 'error',
+						duration: 1000
+					})
+				}
+				else{
+					var login_data = {
+						job_id: this.account,
+						password: this.password
+					}
+					jobid_login(login_data).then((res)=>{
+						if (res === '用户不存在' || res === '密码错误'){
+							uni.showToast({
+								title: res,
+								icon: 'none'
+							})	
+							return;
+						}
+						
+						uni.setStorageSync('token', res.token)
+						uni.setStorageSync('job_id', this.account)
+						this.$store.state.token = res.token
+						this.$store.state.job_id = this.account
+						var jobId_data = {
+							job_id: this.account
+						}
+						queryUserByJobID(jobId_data).then((res)=>{
+							this.$store.state.user = res
+							uni.setStorageSync('role', res.role)
+							uni.setStorageSync('phone', res.phone)
+							this.$store.state.role = res.role
+							this.$store.state.phone = res.phone
+							console.log(this.$store.state.user)
+							uni.showToast({
+								title: '登录成功',
+								icon: 'none'
+							})	
+							setTimeout(() => {
+								// 如果是管理员端
+								if (res.role === "超级管理员"){
+									uni.switchTab({
+										url:'/pages/manager/home/home',
+									})
+									console.log("管理端")
+								}	
+								else{
+									uni.switchTab({
+										url:'/pages/user/home/home',
+									})
+									console.log("用户端")
+								}	
+							}, 1000);	
+						}).catch((err) =>{
+							console.error('获取用户信息失败', err);
+						})
+					}).catch((err) => { 
+						console.error('登录失败', err);
+					})
+				}
+			},
+			phoneLogin(){
+				uni.showToast({
+					title: '验证码登录暂不支持',
+					icon:'none',
+					duration: 1000
+				})
+				return 
+				if (this.code === '' || this.code === null){
+					uni.showToast({
+						title: '验证码不能为空',
+						icon: 'error',
+						duration: 1000
+					})
+				}
+				else{
+					var data = {
+						phone: this.phone,
+						smsCode: this.code
+					}
+					var phone_data = {
+						phone: this.phone
+					}
+					smsLogin(data).then((res)=>{
+						console.log(res)
+						uni.setStorageSync('token', res.token)
+						uni.setStorageSync('phone', this.phone)
+						this.$store.state.token = res.token
+						this.$store.state.phone = this.phone
+						queryByPhone(phone_data).then((res)=>{
+							uni.setStorageSync('role', res.role)
+							uni.setStorageSync('job_id', res.job_id)
+							this.$store.state.role = res.role
+							this.$store.state.job_id = res.job_id
+							if (res.role === "超级管理员"){
+								uni.switchTab({
+									url:'/pages/manager/home/home',
+								})
+								console.log("管理端")
+							}	
+							else{
+								uni.switchTab({
+									url:'/pages/user/home/home',
+								})
+								console.log("用户端")
+							}	
+						})			
+					})
+				}
+			},
+			Forget_Password(){
+				uni.navigateTo({
+					url:'/pages/login/changePwd'
+				})
+			},
+			getCode(){
+				uni.showToast({
+					title: '验证码登录暂不支持',
+					icon:'none',
+					duration: 1000
+				})
+				return
+				console.log('code')	
+				if (this.phone === '' || this.phone === null){
+					uni.showToast({
+						title: '手机号不能为空',
+						icon: 'none',
+						duration: 1000
+					})
+				}else{
+					var login_data = {
+						phone: this.phone
+					}
+					getSmsCode(login_data).then((res)=>{
+						console.log(res)
+						if (res === "该手机号未绑定任何学号/工号"){
+							uni.showToast({
+								title: '该手机号未绑定',
+								icon: 'none',
+								duration: 1000
+							})
+						}else{
+							uni.showToast({
+								title: '发送成功',
+								icon: 'none',
+								duration: 1000
+							})
+							this.sixty = 60
+							this.countTime()
+						}					
+					})
+				}
+				
+			},
+			countTime() {
+				let that = this;
+				var timer = setInterval(function() {
+					that.sixty -= 1;
+					if (that.sixty == 0) {
+						clearInterval(timer);
+					}
+				}, 1000);
+			},
+		}
+	}
 </script>
+
+<style>
+.on_login{
+	width: 50%;
+	color: #fc4c34;
+	text-align: center;
+	font-size: 28rpx; 
+	line-height: 56rpx;
+	border-bottom: 3px #ff6c58 solid;
+}
+.login{
+	width: 50%; 
+	text-align: center; 
+	line-height: 56rpx;
+	font-size: 28rpx;
+	border-bottom: 1px gray solid;
+}
+.login-account{
+	display: flex;
+	flex-direction: row; 
+	height: 56rpx;
+	border-bottom: 1px solid black;
+}
+.login-password{
+	display: flex;
+	flex-direction: row; 
+	height: 56rpx;
+	margin-top: 28rpx;
+	border-bottom: 1px solid black;
+}
+.forget{
+	height: 42rpx;
+	margin-top: 14rpx;
+	font-size: 25.2rpx; 
+	color: #abbedb; 
+	width: 90%; 
+	text-align: right; 
+	margin-left: 5%;
+}
+.forget_hover{
+	color: #007AFF;
+}
+.placeholder_class{
+	font-size: 21rpx;
+	line-height: 56rpx;
+	color: #abbedb;
+}
+.login-button{
+	width: 100%; 
+	height: 77rpx; 
+	line-height: 77rpx;
+	background-color: #ff4a32;
+	border-radius: 42rpx;
+	text-align: center;
+	font-size: 21rpx;
+	color: white;	
+}
+.getCode{
+	background-color: #fbeeee;
+	text-align: center; 
+	height: 42rpx;
+	line-height: 42rpx;
+	margin-top: 7rpx;
+	font-size: 21rpx;
+	color: #fc4c34;
+	border-radius: 20px;
+}
+</style>

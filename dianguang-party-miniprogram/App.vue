@@ -1,4 +1,50 @@
 <script>
-import request from '@/api/index';import {flushReports} from '@/utils/learning';
-export default {onLaunch(){uni.hideTabBar({animation:false,fail(){}});this.restore()},onShow(){uni.hideTabBar({animation:false,fail(){}});if(uni.getStorageSync('user'))flushReports().catch(()=>{})},methods:{async restore(){const job=uni.getStorageSync('job_id');if(!job||!uni.getStorageSync('token'))return;try{const user=await request({url:'user/queryByJobID',data:{job_id:job},silent:true});const safe={...user};delete safe.password;uni.setStorageSync('user',safe);uni.setStorageSync('role',safe.role);Object.assign(this.$store.state,{user:safe,role:safe.role,job_id:job});this.$store.state.branchIdToName=await request({url:'branch/queryIDNameMapping',silent:true});flushReports().catch(()=>{});uni.switchTab({url:safe.role==='超级管理员'?'/pages/manager/home/home':'/pages/user/home/home'})}catch(e){uni.showToast({title:'连接失败，可重新登录后重试',icon:'none'})}}}}
-</script><style lang="scss">@import './styles/mobile.scss';@import './styles/responsive.scss';@import './styles/party-theme.scss';</style>
+	import { jobid_login, queryUserByJobID,queryUserAvatarByJobID } from '@/api/api.js'
+	export default {
+		onLaunch: function() {
+			let token = uni.getStorageSync('token')
+			let job_id = uni.getStorageSync('job_id')
+			let phone = uni.getStorageSync('phone')
+			// 管理员端
+			if (token != '' && job_id != ''){
+				var jobId_data = {
+					job_id: job_id
+				} 
+				queryUserByJobID(jobId_data).then((res)=>{
+					console.log('获取用户信息成功', res);
+					this.$store.state.user = res
+					this.$store.state.role = res.role
+					console.log(this.$store.state.user)
+					if (res.role === "超级管理员"){
+						uni.switchTab({
+							url:'/pages/manager/home/home',
+						})
+						console.log("管理端")
+					}else{
+						uni.switchTab({
+							url:'/pages/user/home/home',
+						})
+						console.log("用户端")
+					}			
+				}).catch((err) =>{
+					console.error('获取用户信息失败', err);
+				})
+			}else{
+				console.log('首次登录')
+			}
+		},
+		onShow: function() {
+			console.log('App Show')
+		},
+		onHide: function() {
+			console.log('App Hide')
+		},
+	}
+</script>
+
+<style lang="scss">
+	/*每个页面公共css */
+	page {
+		background-color: #f7f7f7;
+	}
+</style>

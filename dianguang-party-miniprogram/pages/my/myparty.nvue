@@ -1,1 +1,145 @@
-<template><view class="m-page"><view class="u-page-title">支部通讯录</view><view class="m-search"><input v-model="keyword" placeholder="搜索姓名"/></view><view v-if="error" class="u-state"><text>{{error}}</text><button class="m-small-button" @click="load">重试</button></view><view v-for="member in visible" :key="member.id" class="u-member"><text class="u-member-avatar">{{(member.name||'').slice(0,1)}}</text><view><text class="m-heading">{{member.name}}</text><text class="m-muted">{{member.post || member.role}}</text></view></view><view v-if="!error&&!visible.length" class="m-empty">暂无相关成员</view></view></template><script>import request from '@/api/index';export default {data:()=>({members:[],keyword:'',error:''}),computed:{visible(){return this.members.filter(m=>(m.name||'').includes(this.keyword))}},onLoad(){this.load()},methods:{async load(){this.error='';try{const id=this.$store.state.user.branchId;if(!id)throw new Error('尚未分配支部');this.members=await request({url:'branch/getUsersByBranchID',method:'POST',data:{branch_id:id}})}catch(e){this.error=e.message}}}}</script>
+<template>
+	<view style="padding: 5%;">
+		<!-- 搜索框 -->
+		<view style="height: 84rpx; line-height: 84rpx; width: 100%; margin-bottom: 28rpx;">
+			<uni-search-bar
+				placeholder="搜索"
+				:modelValue="searchQuery"
+				cancelButton="none"
+				@input="onSearchInput"
+			/>
+		</view>
+
+		<!-- 成员列表 -->
+		<view v-for="(item, index) in members" :key="index" class="member-item">
+			<view v-if="searchQuery === '' || item.name.includes(searchQuery)" class="member-card">
+				<!-- 成员信息 -->
+				<view class="member-content">
+					<!-- 成员基本信息 -->
+					<view class="member-info">
+						<u-avatar :src="item.portrait" shape="circle" size="56rpx"></u-avatar>
+						<view class="member-details">
+							<text class="member-name">{{ item.name }}</text>
+							<text class="branch-name">{{ branch.branchName }}</text>
+						</view>
+					</view>
+					<!-- 角色信息，放在右侧 -->
+					<view class="role-info">
+						<text class="role-name">{{ item.post }}</text>
+					</view>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import { getUsersByBranchID } from '@/api/api.js'
+	export default {
+		data() {
+			return {
+				searchQuery: '',
+				branch: '',
+				members: []
+			}
+		},
+		onLoad(options) {
+		    const branchId = parseInt(options.branchId, 10); 
+		    if (isNaN(branchId)) {
+		        console.error('branchId 不是有效的整数:', options.branchId);
+		        return;
+		    }
+		    const data = {
+		        branch_id: branchId
+		    };
+	
+		    getUsersByBranchID(data).then((res) => {
+		        this.members = res; // 获取到的成员列表
+		    }).catch((err) => {
+		        console.error("获取成员信息失败", err);
+		    });
+		},
+		methods: {
+			deleteMember(index) {
+				console.log('Deleting member:', index)
+			},
+			onSearchInput(value) {
+				this.searchQuery = value
+			},
+
+		}
+	}
+</script>
+
+<style>
+.member-item {
+	margin-bottom: 28rpx;
+}
+
+.member-card {
+	width: 100%;
+	padding: 3% 5%;
+	background-color: white;
+	border-radius: 8px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	position: relative; /* 允许子元素绝对定位 */
+}
+
+.member-content {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 100%;
+}
+
+.member-info {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 50%; /* 调整这个宽度使成员信息保持适当大小 */
+}
+
+.member-details {
+	margin-left: 10px; /* 头像与文字的间距 */
+}
+
+.member-name {
+	font-size: 30.8rpx;
+	font-weight: bold;
+}
+
+.branch-name {
+	font-size: 25.2rpx;
+	color: gray;
+	margin-top: 5px;
+}
+
+.role-info {
+	position: absolute;
+	right: 5%; /* 固定在容器的最右边 */
+	top: 50%;
+	transform: translateY(-50%); /* 垂直居中 */
+}
+
+.role-name {
+	font-size: 25.2rpx;
+	color: #6c757d; /* 角色的颜色，可以根据需要调整 */
+}
+
+.btn {
+	width: 25%;
+	height: 56rpx;
+	background-color: #fc4c34;
+	color: white;
+	text-align: center;
+	font-size: 22.4rpx;
+	border-radius: 5px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	line-height: 56rpx;
+}
+
+</style>

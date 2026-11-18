@@ -4,7 +4,7 @@
 			<view class="party">
 				<picker style="width: 100%;" @change="partyChange" :value="branchIndex" :range="branch" v-model="branchType">
 					<view style="display: flex; flex-direction: row; width: 100%; height: 70rpx;">{{branch[branchIndex]}}
-						<image src="/static/icons/down-gray.png" style="margin-left: 1%; margin-top: 14rpx; width: 10%; height: 42rpx;"></image>
+						<image src="/static/manager/home/下.svg" style="margin-left: 1%; margin-top: 14rpx; width: 10%; height: 42rpx;"></image>
 					</view>
 				</picker>
 			</view>

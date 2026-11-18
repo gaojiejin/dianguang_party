@@ -24,7 +24,7 @@
 				<view style="width: 60%; height: 84rpx; line-height: 84rpx; margin-left: 10%;" >
 					<picker style="width: 100%;" @change="partyChange" :value="party_index" :range="party" v-model="partyValue">
 						<view style="display: flex; flex-direction: row; width: 100%; height: 84rpx;">{{party[party_index]}}
-							<image src="/static/icons/down-gray.png" style="margin-left: 1%; margin-top: 21rpx; width: 5%; height: 42rpx;"></image>
+							<image src="/static/manager/home/下.svg" style="margin-left: 1%; margin-top: 21rpx; width: 5%; height: 42rpx;"></image>
 						</view>
 					</picker>
 				</view>
@@ -38,7 +38,7 @@
 			<view style="width: 60%; height: 84rpx; line-height: 84rpx; margin-left: 10%;" >
 				<picker style="width: 100%;" @change="roleChange" :value="role_index" :range="role" v-model="roleValue">
 					<view style="display: flex; flex-direction: row; width: 100%; height: 84rpx;">{{role[role_index]}}
-						<image src="/static/icons/down-gray.png" style="margin-left: 1%; margin-top: 21rpx; width: 5%; height: 42rpx;"></image>
+						<image src="/static/manager/home/下.svg" style="margin-left: 1%; margin-top: 21rpx; width: 5%; height: 42rpx;"></image>
 					</view>
 				</picker>
 			</view>

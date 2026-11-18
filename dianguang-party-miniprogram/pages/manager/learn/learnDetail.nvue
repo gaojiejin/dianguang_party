@@ -1,4 +1,66 @@
-<template><view class="m-page"><view class="m-top"><text class="m-title">{{course.classTitle}}</text></view><view class="m-card"><view class="m-section-title"><text>学习进度</text><text class="m-muted">{{percentage}}%</text></view><u-line-progress :percentage="percentage" activeColor="#C91010" height="12"/></view><view class="m-section-title"><text>课程章节</text><text class="m-muted">{{learnDetail.num || 0}} 节</text></view><view v-for="(item,index) in learnDetail.chapterList" :key="item.chapterId" class="m-card"><text class="m-heading">{{item.title}}</text><view class="m-chapter-footer"><text class="m-muted">{{item.type===1?'图文学习':item.type===2?'视频学习':'链接学习'}}</text><button v-if="item.type===1" class="m-small-button" @click="ToLearnImageText(index)">开始学习</button><button v-else-if="item.type===2" class="m-small-button" @click="ToLearnVideo(index)">开始学习</button><button v-else class="m-small-button" @click="ToLinkweb(index)">开始学习</button></view></view><view v-if="!learnDetail.chapterList || !learnDetail.chapterList.length" class="m-empty">暂无章节</view></view></template>
+<template>
+	<view>
+		<view style="background-color: white;">
+			<view style="height: 210rpx; width: 80%; margin-left: 10%;">
+				<view class="image-contain" :style="{left: percentage-5 + '%'}">
+					<image class="image-background" src="/static/user/learn/进度.svg"></image>
+					<image class="image-overlay" src="/static/user/learn/点赞.svg"></image>
+				</view>
+				<view style="width: 100%;border: 3px solid #f3e5d3; border-radius: 10px;">
+					<u-line-progress :percentage="percentage" activeColor="#ff6b00" height="28rpx"></u-line-progress>
+				</view>	
+			</view>	
+			<view class="title">{{course.classTitle}}</view>
+		</view>
+		
+		<view>
+			<view v-for="(item,index) in learnDetail.chapterList" :key="index" >
+				<view style="width: 90%; margin-left: 5%; border-radius: 10px; height: 210rpx; background-color: white; margin-top: 28rpx;">
+					<view style="height: 112rpx; margin-top: 14rpx; width: 100%; display: flex; flex-direction: row;">
+						<view style="margin-top: 14rpx; width: 12%; margin-left: 5%;">
+							<u-avatar :src="item.chapterPortrait" shape="square" size="84rpx"></u-avatar>	
+						</view>
+						<view style="line-height: 112rpx; width: 65%; margin-left: 5%; font-size: 35rpx; font-weight: bold; overflow-x: auto; white-space: nowrap;">
+							{{item.title}}
+						</view>
+						<view v-if="!learnDetail.chapterIfLearnedList[index]" style="width: 10%; margin-top: 28rpx;">
+							<image src="/static/user/learn/未完成.svg" style="height: 42rpx; width: 100%;"></image>
+						</view>
+						<view v-else style="width: 10%; margin-top: 28rpx;">
+							<image src="/static/user/learn/已完成.svg" style="height: 42rpx; width: 100%;"></image>
+						</view>
+					</view>
+					<view style="height: 70rpx; width: 100%; display: flex; flex-direction: row">
+						<view style="width: 50%; display: flex; flex-direction: row;">
+							<view style="width: 40%; margin-left: 10%; line-height: 70rpx; color: gray;">{{item.founder}}</view>
+							<view style="margin-left: 0%; line-height: 70rpx; color: gray;font-size: small;">{{item.uploadTime ? item.uploadTime.split('T')[0]:''}}</view>
+						</view>
+						<view v-if="item.type === 1" style="width: 20%; height: 70rpx; display: flex; flex-direction: row;">
+							<image src="/static/user/learn/图文.svg" style="height: 35rpx; width: 60%; margin-top: 17.5rpx;"></image>
+							<view style="font-size: 25.2rpx; color: gray; line-height: 70rpx;">图文</view>
+						</view>
+						<view v-else-if="item.type === 2" style="width: 20%; height: 70rpx; display: flex; flex-direction: row;">
+							<image src="/static/user/learn/视频.svg" style="height: 35rpx; width: 60%; margin-top: 17.5rpx;"></image>
+							<view style="font-size: 25.2rpx; color: gray; line-height: 70rpx;">视频</view>
+						</view>
+						<view v-else style="width: 20%; height: 70rpx; display: flex; flex-direction: row;">
+							<image src="/static/user/learn/链接.svg" style="height: 35rpx; width: 60%; margin-top: 17.5rpx;"></image>
+							<view style="font-size: 25.2rpx; color: gray; line-height: 70rpx;">链接</view>
+						</view>
+						<view style="width: 30%; height: 70rpx;">
+							<button v-if="item.type === 1" class="btn" @click="ToLearnImageText(index)">▽ 学习</button>
+							<button v-else-if="item.type === 2" class="btn" @click="ToLearnVideo(index)">▽ 学习</button>
+							<button v-else class="btn" @click="ToLinkweb(index)">▽ 学习</button>
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
+	
+		<view style="margin-top: 42rpx;"></view>
+	</view>
+</template>
+
 <script>
 	import { getUserLearnDetail } from '@/api/api.js'
 	export default {
@@ -33,7 +95,7 @@
 		methods: {
 			ToLearnImageText(index){
 				uni.navigateTo({
-					url:`/pages/component/image/ImageTextLearn?class_id=${this.course.classId}&chapter_id=${this.learnDetail.chapterList[index].chapterId}`
+					url:`/pages/component/image/ImageTextLearn?&class_id=${encodeURIComponent(JSON.stringify(this.course.classId))}&chapter=${encodeURIComponent(JSON.stringify(this.learnDetail.chapterList[index]))}&ifLearned=${encodeURIComponent(JSON.stringify(this.learnDetail.chapterIfLearnedList[index]))}`
 				})
 			},
 			ToLinkweb(index){
@@ -50,3 +112,52 @@
 		}
 	}
 </script>
+
+<style>
+.image-contain{
+	position: relative;
+	width: 10%;
+	height: 70rpx;
+	margin-top: 70rpx;
+}
+.image-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.image-overlay {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-35deg);
+  width: 40%; /* 根据需要调整第二张图片的尺寸 */
+  height: 40%;
+  object-fit: cover;
+}
+.title{
+	width: 80%; 
+	height: 84rpx; 
+	margin-left: 10%;
+	margin-top: 28rpx; 
+	font-size: 42rpx; 
+	line-height: 84rpx; 
+	font-weight: bold; 
+	text-align: center;
+	overflow-x: auto; white-space: nowrap;
+}
+.btn{
+	height: 3ch; 
+	width: 80%; 
+	margin-left: 10%;
+	margin-top: 14rpx; 
+	border-radius: 10px; 
+	background-color: #f5f3f1;
+	color: #fa9d7b;
+	font-size: 25.2rpx;
+	text-align: center;
+	line-height: 42rpx;
+}
+</style>

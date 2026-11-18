@@ -2,7 +2,6 @@
 	"easycom": {
 		"autoscan": true,
 		"custom": {
- "^party-icon$": "@/component/partyIcon.vue",
 			// uni-ui 规则如下配置
 			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
 			"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
@@ -23,7 +22,6 @@
 				"navigationBarTitleText": "忘记密码"
 			}
 		},
-		{"path":"pages/my/certificate","style":{"navigationBarTitleText":"学习证明"}},
 		{
 			"path": "pages/my/my",
 			"style": {
@@ -57,13 +55,13 @@
 		{
 			"path": "pages/user/home/home",
 			"style": {
-				"navigationBarTitleText": "首页", "enablePullDownRefresh": true
+				"navigationBarTitleText": "首页"
 			}
 		},
 		{
 			"path": "pages/user/home/catalogue",
 			"style": {
-				"navigationBarTitleText": "首页", "enablePullDownRefresh": true
+				"navigationBarTitleText": "首页"
 			}
 		},
 		{
@@ -76,7 +74,7 @@
 			"path": "pages/component/image/ImageTextLearn",
 			"style": {
 				"navigationBarTitleText": "图文学习",
-				"onReachBottomDistance": 0
+				"onReachBottonDistance": 0
 			}
 		},
 		{
@@ -94,7 +92,7 @@
 		{
 			"path": "pages/user/learn/learn",
 			"style": {
-				"navigationBarTitleText": "学习", "enablePullDownRefresh": true
+				"navigationBarTitleText": "学习"
 			}
 		},
 		{
@@ -195,7 +193,7 @@
 		{
 			"path": "pages/manager/home/home",
 			"style": {
-				"navigationBarTitleText": "首页", "enablePullDownRefresh": true
+				"navigationBarTitleText": "首页"
 			}
 		},
 		{
@@ -259,7 +257,7 @@
 		{
 			"path": "pages/manager/learn/learn",
 			"style": {
-				"navigationBarTitleText": "学习", "enablePullDownRefresh": true
+				"navigationBarTitleText": "学习"
 			}
 		},
 		{
@@ -351,4 +349,3 @@
 	},
 	"uniIdRouter": {}
 }
-
